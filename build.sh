@@ -4,6 +4,7 @@
 #   ./build.sh              → render all scenes + open presentation.html
 #   ./build.sh s01          → render single scene + open in browser
 #   ./build.sh s01 low      → render with custom quality (low/medium/high/production/4k)
+#   ./build.sh html         → convert-only (skip rendering), open presentation.html
 #   ./build.sh clean        → remove all build artifacts (media/, slides/, output/)
 
 set -e
@@ -36,7 +37,15 @@ resolve_quality() {
   esac
 }
 
-run_manim() { conda run --no-banner -n $CONDA_ENV "$@"; }
+run_manim() { conda run -n $CONDA_ENV --live-stream "$@"; }
+
+needs_render() {
+  local file=$1 cls=$2
+  local json="slides/${cls}.json"
+  [ ! -f "$json" ] && return 0
+  [ "$file" -nt "$json" ] && return 0
+  return 1
+}
 
 render_scene() {
   local file=$1 cls=$2 quality=$3
@@ -48,6 +57,19 @@ if [ "$1" = "clean" ]; then
   echo "Removing build artifacts..."
   rm -rf media/ slides/ output/
   echo "Done."
+  exit 0
+fi
+
+# ── html only (convert, no render) ──────────────────────────────────────────
+if [ "$1" = "html" ]; then
+  ALL_CLASSES=""
+  for entry in "${SCENES[@]}"; do
+    read -r file cls tag <<< "$entry"
+    ALL_CLASSES="$ALL_CLASSES $cls"
+  done
+  echo "Converting to $OUT_DIR/presentation.html..."
+  run_manim manim-slides convert $ALL_CLASSES "$OUT_DIR/presentation.html"
+  open "$OUT_DIR/presentation.html"
   exit 0
 fi
 
@@ -73,11 +95,15 @@ fi
 
 quality=$(resolve_quality "$1")  # no arg → high
 ALL_CLASSES=""
-echo "Rendering all scenes..."
+echo "Rendering scenes (skipping unchanged)..."
 for entry in "${SCENES[@]}"; do
   read -r file cls tag <<< "$entry"
-  echo "  → $cls"
-  render_scene "$file" "$cls" "$quality"
+  if needs_render "$file" "$cls"; then
+    echo "  → $cls (rendering)"
+    render_scene "$file" "$cls" "$quality"
+  else
+    echo "  → $cls (up to date)"
+  fi
   ALL_CLASSES="$ALL_CLASSES $cls"
 done
 
