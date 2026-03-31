@@ -102,38 +102,177 @@ class S02CausalityPrimer(Slide):
     def construct(self):
         self.camera.background_color = BG
 
-        # ── Slide 1: title + definition ───────────────────────────────────────
-        title = slide_title("Causal Inference — Primer")
-        emoji = _emoji("🎯", height=0.38)
-        defn_txt = Text("modelling the effect of real-world interventions",
-                        color=_W).scale(0.36)
-        defn = Group(emoji, defn_txt).arrange(RIGHT, buff=0.18)
-        defn.next_to(title, DOWN, buff=0.28)
+        # ── Slide 2: title + ChatGPT prompt + GIFs ──────────────────────────────
 
-        self.play(Write(title), run_time=0.8)
-        self.play(FadeIn(defn, shift=UP * 0.08), run_time=0.6)
+        motiv_title = Text("Motivation: Social Immunity",
+                           t2s={"Social Immunity": ITALIC},
+                           color=_W).scale(TITLE_SCALE).to_edge(UP, buff=0.4)
+        self.play(Write(motiv_title), run_time=0.8)
+        self.wait(0.3)
+
+        # ── ChatGPT box — dark mode ──────────────────────────────────────────
+        _BXW  = 9.0
+        _BXH  = _BXW / 5.41
+        _BXCR = _BXH * 0.18
+        _SEP  = 0.667
+
+        _CTXT = "#E8E8E8"       # light text on dark bg
+        _CGRY = "#9A9A9A"       # toolbar icon gray
+        _CBLU = "#8AB4F8"       # "Extended thinking" blue
+        _CBDR = "#4A4A4A"       # subtle border
+        _CSEP = "#4A4A4A"       # separator line
+        _CBGF = "#303030"       # box fill
+
+        chat_box = RoundedRectangle(
+            width=_BXW, height=_BXH, corner_radius=_BXCR,
+            fill_color=_CBGF, fill_opacity=1,
+            stroke_color=_CBDR, stroke_width=1.2,
+        ).move_to([0, 1.85, 0])
+
+        _BXL = chat_box.get_left()[0]
+        _BXR = chat_box.get_right()[0]
+        _BXT = chat_box.get_top()[1]
+        _BXB = chat_box.get_bottom()[1]
+
+        _sy = _BXT - _SEP * _BXH
+        chat_sep = Line(
+            [_BXL + 0.06, _sy, 0], [_BXR - 0.06, _sy, 0],
+            color=_CSEP, stroke_width=0.7,
+        )
+        _by = (_sy + _BXB) / 2
+
+        # "+" icon — two thin crossed lines
+        _pl = 0.09
+        chat_plus = VGroup(
+            Line([0, -_pl, 0], [0, _pl, 0], color=_CGRY, stroke_width=1.6),
+            Line([-_pl, 0, 0], [_pl, 0, 0], color=_CGRY, stroke_width=1.6),
+        ).move_to([_BXL + 0.043 * _BXW, _by, 0])
+
+        # Extended thinking icon — clock face (circle + two hands)
+        _er = _BXH * 0.055
+        _ex = _BXL + 0.100 * _BXW
+        et_circ = Circle(
+            radius=_er, color=_CBLU, stroke_width=1.4, fill_opacity=0,
+        ).move_to([_ex, _by, 0])
+        # minute hand: center → 12 o'clock
+        et_hand1 = Line(
+            [_ex, _by, 0], [_ex, _by + _er * 0.60, 0],
+            color=_CBLU, stroke_width=1.4,
+        )
+        # hour hand: center → ~2 o'clock
+        et_hand2 = Line(
+            [_ex, _by, 0],
+            [_ex + _er * 0.42 * np.cos(np.radians(60)),
+             _by + _er * 0.42 * np.sin(np.radians(60)) * (-1) + _er * 0.42 * np.sin(np.radians(30)),
+             0],
+            color=_CBLU, stroke_width=1.4,
+        )
+        # simpler: hand pointing to ~2 o'clock = 60° from 12 = angle 30° from horizontal-right
+        _h2x = _ex + _er * 0.42 * np.sin(np.radians(60))
+        _h2y = _by + _er * 0.42 * np.cos(np.radians(60))
+        et_hand2 = Line(
+            [_ex, _by, 0], [_h2x, _h2y, 0],
+            color=_CBLU, stroke_width=1.4,
+        )
+        et_clock = VGroup(et_circ, et_hand1, et_hand2)
+        et_lbl = Text(
+            "Extended thinking", color=_CBLU, font="Helvetica Neue",
+        ).scale(0.22)
+        et_lbl.next_to(et_clock, RIGHT, buff=_BXW * 0.010).set_y(_by)
+        # "v" chevron — match x-height of "Extended thinking" text
+        _chev_h = et_lbl.height * 0.38
+        _chev_w = _chev_h * 0.9
+        et_chev = VGroup(
+            Line([-_chev_w, _chev_h * 0.5, 0], ORIGIN, color=_CBLU, stroke_width=1.2),
+            Line([_chev_w, _chev_h * 0.5, 0],  ORIGIN, color=_CBLU, stroke_width=1.2),
+        )
+        et_chev.next_to(et_lbl, RIGHT, buff=_BXW * 0.005).set_y(_by)
+        et_pill = VGroup(et_clock, et_lbl, et_chev)
+
+        # Microphone icon
+        _mx = _BXL + 0.900 * _BXW
+        _mr = _BXH * 0.035
+        mic_body = RoundedRectangle(
+            width=_mr * 2, height=_mr * 3.4, corner_radius=_mr,
+            stroke_color=_CGRY, stroke_width=1.2, fill_opacity=0,
+        ).move_to([_mx, _by + _mr * 0.7, 0])
+        mic_arc = Arc(
+            radius=_mr * 1.65,
+            start_angle=-PI * 0.17, angle=-(PI * 0.66),
+            color=_CGRY, stroke_width=1.2,
+        ).move_to([_mx, mic_body.get_bottom()[1] - _mr * 0.10, 0])
+        _mbot = mic_arc.get_bottom()[1]
+        mic_stem = Line(
+            [_mx, _mbot, 0], [_mx, _mbot - _mr * 0.85, 0],
+            color=_CGRY, stroke_width=1.2,
+        )
+        mic_base = Line(
+            [_mx - _mr * 0.9, mic_stem.get_end()[1], 0],
+            [_mx + _mr * 0.9, mic_stem.get_end()[1], 0],
+            color=_CGRY, stroke_width=1.2,
+        )
+        mic_icon = VGroup(mic_body, mic_arc, mic_stem, mic_base)
+
+        # Send button — white circle with up-arrow (↑)
+        _snx = _BXL + 0.963 * _BXW
+        _snr = _BXH * 0.088
+        snd_bg = Circle(
+            radius=_snr, fill_color="#FFFFFF", fill_opacity=1, stroke_opacity=0,
+        ).move_to([_snx, _by, 0])
+        _aw = _snr * 0.34   # arrowhead half-width
+        _atop = _by + _snr * 0.45   # arrow tip
+        _abot = _by - _snr * 0.45   # shaft bottom
+        _amid = _by + _snr * 0.05   # arrowhead base
+        snd_shaft = Line(
+            [_snx, _abot, 0], [_snx, _atop, 0],
+            color=_CBGF, stroke_width=2.2,
+        )
+        snd_head = VGroup(
+            Line([_snx - _aw, _amid, 0],
+                 [_snx, _atop, 0], color=_CBGF, stroke_width=2.2),
+            Line([_snx + _aw, _amid, 0],
+                 [_snx, _atop, 0], color=_CBGF, stroke_width=2.2),
+        )
+        snd_btn = VGroup(snd_bg, snd_shaft, snd_head)
+
+        chat_toolbar = VGroup(chat_sep, chat_plus, et_pill, mic_icon, snd_btn)
+
+        PROMPT = (
+            "What is the social effect of a pathogen exposure? "
+            "I have some hypotheses but unsure if exhaustive.\n"
+            "See experiment in attachment."
+        )
+        prompt_mob = Text(
+            PROMPT, color=_CTXT,
+            font="Helvetica Neue", font_size=30,
+            line_spacing=1.20,
+        )
+        prompt_mob.set_width(0.909 * _BXW)
+        prompt_mob.align_to([_BXL + 0.031 * _BXW, 0, 0], LEFT)
+        prompt_mob.align_to([0, _BXT - 0.153 * _BXH, 0], UP)
+
+        chat_shell = VGroup(chat_box, chat_toolbar)
+
+        # Box appears + typing animation
+        self.play(FadeIn(chat_shell), run_time=0.7)
+        self.wait(0.3)
+        self.play(AddTextLetterByLetter(prompt_mob, time_per_char=0.035),
+                  run_time=3.5)
         self.wait(0.5)
         self.next_slide()
 
-        # ── Slide 2: two gifs looping 4× ─────────────────────────────────────
+        # ── GIFs appear below the ChatGPT box ────────────────────────────────
         fps, n_frames = 10, 40
         duration = n_frames / fps
         n_loops  = 4
 
-        vid_t = VideoPlayer(TFRAMES, fps=fps).scale_to_fit_height(3.2)
-        vid_e = VideoPlayer(EFRAMES, fps=fps).scale_to_fit_height(3.2)
-        lbl_t = Text("treatment",                  color=GRAY_TEXT).scale(0.30)
-        lbl_e = Text("post-treatment observation", color=GRAY_TEXT).scale(0.30)
-        col_t = Group(vid_t, lbl_t).arrange(DOWN, buff=0.18)
-        col_e = Group(vid_e, lbl_e).arrange(DOWN, buff=0.18)
-        vids  = Group(col_t, col_e).arrange(RIGHT, buff=1.0).center().shift(DOWN * 0.4)
-
-        example_title = Text(
-            "Motivating Example: social immunity in ants",
-            t2s={"social immunity in ants": ITALIC},
-            color=_W,
-        ).scale(BODY_SCALE)
-        example_title.next_to(vids, UP, buff=0.35).align_to(vids, LEFT)
+        vid_t = VideoPlayer(TFRAMES, fps=fps).scale_to_fit_height(2.8)
+        vid_e = VideoPlayer(EFRAMES, fps=fps).scale_to_fit_height(2.8)
+        lbl_t = Text("treatment",                  color=GRAY_TEXT).scale(0.28)
+        lbl_e = Text("post-treatment observation", color=GRAY_TEXT).scale(0.28)
+        col_t = Group(vid_t, lbl_t).arrange(DOWN, buff=0.14)
+        col_e = Group(vid_e, lbl_e).arrange(DOWN, buff=0.14)
+        vids  = Group(col_t, col_e).arrange(RIGHT, buff=0.8).move_to([0, -1.2, 0])
 
         tracker = ValueTracker(0)
         upd_t = lambda m: m.set_time(tracker.get_value())
@@ -141,23 +280,26 @@ class S02CausalityPrimer(Slide):
         vid_t.add_updater(upd_t)
         vid_e.add_updater(upd_e)
 
-        # both clips enter together with a slow fade
-        self.play(FadeIn(vids), FadeIn(example_title, shift=DOWN * 0.06), run_time=1.2)
+        self.play(FadeIn(vids), run_time=0.8)
         self.play(tracker.animate.set_value(n_loops * duration),
                   run_time=n_loops * duration, rate_func=linear)
         vid_t.clear_updaters()
         vid_e.clear_updaters()
         self.next_slide()
 
-        # ── Slide 3: replace gifs with T→Y DAG centred ───────────────────────
+        # ── Slide 3: GIFs replaced by DAG at same position (ChatGPT stays) ──
         dag = _make_dag()
-        dag.center()
-        self.play(FadeOut(vids), FadeOut(example_title), FadeIn(dag), run_time=1.4)
+        dag.move_to(vids)
+        self.play(
+            FadeOut(vids),
+            FadeIn(dag),
+            run_time=1.0,
+        )
         self.wait(0.8)
         self.next_slide()
 
-        # ── Slide 4: DAG squeezes to top-right + table enters simultaneously ───
-        # scale 0.52: rightmost point ≈ (2.1+0.48)*0.52 ≈ 1.34; at x=5.4 → 6.74 (safe)
+        # ── Slide 4: ChatGPT removed, title → "Primer: Causal Inference",
+        #             DAG → top-right + table/equations ───────────────────────
         h_i  = _hdr(r"i",       0)
         h_Ti = _hdr(r"T_i",     1)
         h_Yi = _hdr(r"Y_i",     2)
@@ -180,10 +322,16 @@ class S02CausalityPrimer(Slide):
         exp_lbl = Text("Experiment:", color=GRAY_TEXT).scale(0.36)
         exp_lbl.next_to(sep_top_full, UP, buff=0.10).align_to(sep_top_full, LEFT)
 
+        # New title
+        title = Text("Primer: Causal Inference",
+                     t2s={"Causal Inference": ITALIC},
+                     color=_W).scale(TITLE_SCALE).to_edge(UP, buff=0.4)
+
         self.play(
+            FadeOut(chat_shell), FadeOut(prompt_mob),
+            ReplacementTransform(motiv_title, title),
             dag.animate.scale(0.52).move_to([5.6, 3.3, 0]),
-            FadeOut(defn),
-            run_time=0.7,
+            run_time=0.8,
         )
 
         # Step 1 ── "Experiment:" label alone
@@ -351,10 +499,10 @@ class S02CausalityPrimer(Slide):
         _q_center = np.array([xs6[5], _row_y(2), 0])   # vertical midpoint of rows
         big_q = MathTex(r"?", color=_Q).scale(_S * 4.5).move_to(_q_center)
         fpci_lbl = Text(
-            "Foundational Problem\nof Causal Inference",
+            "Foundamental Problem of Causal Inference",
             color=GRAY_TEXT,
-        ).scale(0.34)
-        fpci_lbl.move_to([0, big_q.get_bottom()[1] - 0.48, 0])
+        ).scale(0.44)
+        fpci_lbl.move_to([0, SEP_BOT_Y - 0.70, 0])
 
         tau_copies = VGroup(*[tau_cells[ri].copy() for ri in range(5)])
         self.add(tau_copies)
@@ -377,71 +525,17 @@ class S02CausalityPrimer(Slide):
             run_time=0.6,
         )
 
-        # ── ATE formula ───────────────────────────────────────────────────────
+        # ── Define all three equation rows + labels upfront ──────────────────
+        t1_rows = [ri for ri, (ti, *_) in enumerate(rows_data) if ti == "1"]
+        t0_rows = [ri for ri, (ti, *_) in enumerate(rows_data) if ti == "0"]
+
         ate = MathTex(
             r"\tau", r"\;=\;",
             r"\mathbb{E}[Y_i(1)]", r"-", r"\mathbb{E}[Y_i(0)]",
             color=_W,
         ).scale(0.52)
         ate.move_to([0, -2.05, 0])
-        ate.align_to([X_LEFT, 0, 0], LEFT)   # left-align with table
-
-        causal_lbl = Text("(causal estimand)", color=DIM_GRAY).scale(0.22)
-        causal_lbl.next_to(ate, RIGHT, buff=0.28)
-
-        idt_section_lbl = Text("Identify:", color=GRAY_TEXT).scale(0.36)
-        idt_section_lbl.next_to(ate, UP, buff=0.22).align_to(exp_lbl, LEFT)
-
-        self.play(FadeIn(ate), FadeIn(causal_lbl), FadeIn(idt_section_lbl), run_time=0.6)
-        self.wait(0.4)
-        self.next_slide()
-
-        # ── Emphasise E[Y_i(1)] + Y_i(1) column ──────────────────────────────
-        rect_E1      = SurroundingRectangle(ate[2], color=BLUE_LIGHT, buff=0.06, stroke_width=1.5)
-        col_Y1_grp   = VGroup(*[row_mobs[ri][3] for ri in range(5)], dots_5[3])
-        rect_col_E1  = SurroundingRectangle(col_Y1_grp, color=BLUE_LIGHT, buff=0.10, stroke_width=1.2)
-        self.play(
-            ate[2].animate.set_color(BLUE_LIGHT),
-            Create(rect_E1),
-            h_Y1.animate.set_color(BLUE_LIGHT),
-            *[row_mobs[ri][3].animate.set_color(BLUE_LIGHT) for ri in range(5)],
-            dots_5[3].animate.set_color(BLUE_LIGHT),
-            Create(rect_col_E1),
-            run_time=0.4,
-        )
-        self.wait(0.4)
-        self.next_slide()
-
-        # ── Restore + emphasise E[Y_i(0)] + Y_i(0) column ───────────────────
-        rect_E0      = SurroundingRectangle(ate[4], color=BLUE_LIGHT, buff=0.06, stroke_width=1.5)
-        col_Y0_grp   = VGroup(*[row_mobs[ri][4] for ri in range(5)], dots_5[4])
-        rect_col_E0  = SurroundingRectangle(col_Y0_grp, color=BLUE_LIGHT, buff=0.10, stroke_width=1.2)
-        self.play(
-            ate[2].animate.set_color(_W),
-            FadeOut(rect_E1), FadeOut(rect_col_E1),
-            h_Y1.animate.set_color(_W),
-            *[row_mobs[ri][3].animate.set_color(orig_col(3, ri)) for ri in range(5)],
-            dots_5[3].animate.set_color(_W),
-            ate[4].animate.set_color(BLUE_LIGHT),
-            Create(rect_E0),
-            h_Y0.animate.set_color(BLUE_LIGHT),
-            *[row_mobs[ri][4].animate.set_color(BLUE_LIGHT) for ri in range(5)],
-            dots_5[4].animate.set_color(BLUE_LIGHT),
-            Create(rect_col_E0),
-            run_time=0.4,
-        )
-        self.wait(0.4)
-        self.next_slide()
-
-        # ── Restore + identification ──────────────────────────────────────────
-        self.play(
-            ate[4].animate.set_color(_W),
-            FadeOut(rect_E0), FadeOut(rect_col_E0),
-            h_Y0.animate.set_color(_W),
-            *[row_mobs[ri][4].animate.set_color(orig_col(4, ri)) for ri in range(5)],
-            dots_5[4].animate.set_color(_W),
-            run_time=0.3,
-        )
+        ate.align_to([X_LEFT, 0, 0], LEFT)
 
         idt = MathTex(
             r"\phantom{\tau}", r"\;=\;",
@@ -449,58 +543,240 @@ class S02CausalityPrimer(Slide):
             color=_W,
         ).scale(0.52)
         idt.next_to(ate, DOWN, buff=0.45)
-        # align "=" signs explicitly so they stack vertically
-        shift_x = ate[1].get_center()[0] - idt[1].get_center()[0]
-        idt.shift(RIGHT * shift_x)
+        idt.shift(RIGHT * (ate[1].get_center()[0] - idt[1].get_center()[0]))
 
-        stat_lbl = Text("(statistical estimand)", color=DIM_GRAY).scale(0.22)
-        stat_lbl.next_to(idt, RIGHT, buff=0.28)
+        est = MathTex(
+            r"\phantom{\tau}", r"\;\approx\;",
+            r"0.50", r"-", r"0.66", r"\;=\;", r"-0.16",
+            color=_W,
+        ).scale(0.52)
+        est.next_to(idt, DOWN, buff=0.35)
+        est.shift(RIGHT * (ate[1].get_center()[0] - est[1].get_center()[0]))
 
+        # all equations start ghosted; only the final result is pre-coloured red
+        _GHOST = 0.25
+        ate.set_opacity(_GHOST)
+        idt.set_opacity(_GHOST)
+        est.set_opacity(_GHOST)
+        # est[6] stays white – no special pre-colour
+
+        # labels – same scale, aligned to the same x
+        _LSCALE = 0.26
+        causal_lbl = Text("(causal estimand)",      color=DIM_GRAY).scale(_LSCALE)
+        stat_lbl   = Text("(statistical estimand)", color=DIM_GRAY).scale(_LSCALE)
+        est_lbl    = Text("(statistical estimate)", color=DIM_GRAY).scale(_LSCALE)
+        causal_lbl.next_to(ate, RIGHT, buff=0.28)
+        stat_lbl.next_to(idt,   RIGHT, buff=0.28)
+        est_lbl.next_to(est,    RIGHT, buff=0.28)
+        lbl_x = max(causal_lbl.get_left()[0],
+                    stat_lbl.get_left()[0],
+                    est_lbl.get_left()[0]) + 0.4
+        for lbl in [causal_lbl, stat_lbl, est_lbl]:
+            lbl.align_to([lbl_x, 0, 0], LEFT)
+
+        idt_section_lbl = Text("Average Treatment Effect:", color=GRAY_TEXT).scale(0.36)
+        idt_section_lbl.next_to(ate, UP, buff=0.22).align_to(exp_lbl, LEFT)
+
+        # ── All equations ghosted + labels ────────────────────────────────────
         self.play(
-            FadeIn(idt), FadeIn(stat_lbl),
-            run_time=0.6,
+            FadeIn(ate), FadeIn(idt), FadeIn(est),
+            FadeIn(causal_lbl), FadeIn(stat_lbl), FadeIn(est_lbl),
+            FadeIn(idt_section_lbl),
+            run_time=0.7,
         )
         self.wait(0.4)
         self.next_slide()
 
-        # ── Emphasise E[Y_i|T=1] + Y_i(1) entries for T=1 rows ──────────────
-        t1_rows = [ri for ri, (ti, *_) in enumerate(rows_data) if ti == "1"]
-        t0_rows = [ri for ri, (ti, *_) in enumerate(rows_data) if ti == "0"]
+        # ── Step 1: row 1 white → E[Y_i(1)] blue → white ─────────────────────
+        col_Y1_grp  = VGroup(*[row_mobs[ri][3] for ri in range(5)], dots_5[3])
+        rect_col_E1 = SurroundingRectangle(col_Y1_grp, color=BLUE_LIGHT, buff=0.10, stroke_width=1.2)
 
-        rect_I1       = SurroundingRectangle(idt[2], color=BLUE_LIGHT, buff=0.06, stroke_width=1.5)
+        # 1a: ate → full white
+        self.play(ate.animate.set_opacity(1), run_time=0.4)
+        self.wait(0.15)
+
+        # 1b: ate[2] → blue + term rect + column highlight
+        rect_E1 = SurroundingRectangle(ate[2], color=BLUE_LIGHT, buff=0.06, stroke_width=1.5)
+        self.play(
+            ate[2].animate.set_color(BLUE_LIGHT),
+            Create(rect_E1), Create(rect_col_E1),
+            *[row_mobs[ri][3].animate.set_color(BLUE_LIGHT) for ri in range(5)],
+            dots_5[3].animate.set_color(BLUE_LIGHT),
+            run_time=0.4,
+        )
+        self.wait(0.3)
+
+        # 1c: ate[2] → white, restore column
+        self.play(
+            ate[2].animate.set_color(_W),
+            FadeOut(rect_E1), FadeOut(rect_col_E1),
+            *[row_mobs[ri][3].animate.set_color(orig_col(3, ri)) for ri in range(5)],
+            dots_5[3].animate.set_color(_W),
+            run_time=0.45,
+        )
+        self.wait(0.35)
+
+        # ── Step 2 (same slide): E[Y_i(0)] blue → white ──────────────────────
+        col_Y0_grp  = VGroup(*[row_mobs[ri][4] for ri in range(5)], dots_5[4])
+        rect_col_E0 = SurroundingRectangle(col_Y0_grp, color=BLUE_LIGHT, buff=0.10, stroke_width=1.2)
+
+        # 2a: ate[4] → blue + term rect + column highlight
+        rect_E0 = SurroundingRectangle(ate[4], color=BLUE_LIGHT, buff=0.06, stroke_width=1.5)
+        self.play(
+            ate[4].animate.set_color(BLUE_LIGHT),
+            Create(rect_E0), Create(rect_col_E0),
+            *[row_mobs[ri][4].animate.set_color(BLUE_LIGHT) for ri in range(5)],
+            dots_5[4].animate.set_color(BLUE_LIGHT),
+            run_time=0.5,
+        )
+        self.wait(0.35)
+
+        # 2b: ate[4] → white, restore column
+        self.play(
+            ate[4].animate.set_color(_W),
+            FadeOut(rect_E0), FadeOut(rect_col_E0),
+            *[row_mobs[ri][4].animate.set_color(orig_col(4, ri)) for ri in range(5)],
+            dots_5[4].animate.set_color(_W),
+            run_time=0.45,
+        )
+        self.wait(0.25)
+        self.next_slide()
+
+        # ── Step 3: rows 2+3 white first, then E[Y|T=1] blue + box + aggregate ─
+
+        # 3a: idt + est[0:5] → full white (est[5:7] stay ghosted)
+        self.play(
+            idt.animate.set_opacity(1),
+            *[est[i].animate.set_opacity(1) for i in range(5)],
+            run_time=0.5,
+        )
+        self.wait(0.3)
+
+        # 3b: idt[2] → blue (start highlighting)
+        self.play(
+            idt[2].animate.set_color(BLUE_LIGHT),
+            run_time=0.3,
+        )
+        self.wait(0.2)
+
+        # 3c: box idt[2] term + box T=1 table cells
+        rect_idt2 = SurroundingRectangle(idt[2], color=BLUE_LIGHT, buff=0.06, stroke_width=1.5)
         cell_rects_I1 = VGroup(*[
-            SurroundingRectangle(row_mobs[ri][3], color=BLUE_LIGHT, buff=0.08, stroke_width=1.2)
+            SurroundingRectangle(row_mobs[ri][3], color=BLUE_LIGHT,
+                                 buff=0.08, stroke_width=1.2)
             for ri in t1_rows
         ])
         self.play(
-            idt[2].animate.set_color(BLUE_LIGHT),
-            Create(rect_I1),
+            Create(rect_idt2),
             *[row_mobs[ri][3].animate.set_color(BLUE_LIGHT) for ri in t1_rows],
             *[row_mobs[ri][3].animate.set_color(DIM_GRAY)   for ri in t0_rows],
             *[Create(r) for r in cell_rects_I1],
-            run_time=0.4,
+            run_time=0.35,
+        )
+        self.wait(0.1)
+
+        # 3c: copies fly → est[2] blue; boxes out
+        copies_T1 = VGroup(*[row_mobs[ri][3].copy() for ri in t1_rows])
+        self.add(copies_T1)
+        tgt_T1 = est[2].get_center()
+        self.play(
+            *[copies_T1[i].animate.move_to(tgt_T1).scale(0.4).set_opacity(0)
+              for i in range(len(t1_rows))],
+            est[2].animate.set_color(BLUE_LIGHT),
+            FadeOut(rect_idt2), FadeOut(cell_rects_I1),
+            run_time=0.5,
+        )
+        self.wait(0.15)
+
+        # 3d: idt[2] → white, est[2] → white, cells restore
+        self.play(
+            idt[2].animate.set_color(_W),
+            est[2].animate.set_color(_W),
+            *[row_mobs[ri][3].animate.set_color(orig_col(3, ri)) for ri in t1_rows],
+            *[row_mobs[ri][3].animate.set_color(orig_col(3, ri)) for ri in t0_rows],
+            run_time=0.45,
         )
         self.wait(0.4)
-        self.next_slide()
 
-        # ── Restore + emphasise E[Y_i|T=0] + Y_i(0) entries for T=0 rows ────
-        rect_I0       = SurroundingRectangle(idt[4], color=BLUE_LIGHT, buff=0.06, stroke_width=1.5)
+        # ── Step 4 (same slide): E[Y|T=0] blue + box term + box cells
+        #           → aggregate → est[4] blue → all white ─────────────────────
+
+        # 4a: idt[4] → blue + box term
+        rect_idt4 = SurroundingRectangle(idt[4], color=BLUE_LIGHT, buff=0.06, stroke_width=1.5)
+        self.play(
+            idt[4].animate.set_color(BLUE_LIGHT),
+            Create(rect_idt4),
+            run_time=0.3,
+        )
+        self.wait(0.2)
+
+        # 4b: box T=0 table cells
         cell_rects_I0 = VGroup(*[
-            SurroundingRectangle(row_mobs[ri][4], color=BLUE_LIGHT, buff=0.08, stroke_width=1.2)
+            SurroundingRectangle(row_mobs[ri][4], color=BLUE_LIGHT,
+                                 buff=0.08, stroke_width=1.2)
             for ri in t0_rows
         ])
         self.play(
-            idt[2].animate.set_color(_W),
-            FadeOut(rect_I1),
-            *[row_mobs[ri][3].animate.set_color(orig_col(3, ri)) for ri in t1_rows],
-            *[row_mobs[ri][3].animate.set_color(orig_col(3, ri)) for ri in t0_rows],
-            idt[4].animate.set_color(BLUE_LIGHT),
-            Create(rect_I0),
             *[row_mobs[ri][4].animate.set_color(BLUE_LIGHT) for ri in t0_rows],
             *[row_mobs[ri][4].animate.set_color(DIM_GRAY)   for ri in t1_rows],
-            *[FadeOut(r) for r in cell_rects_I1],
             *[Create(r) for r in cell_rects_I0],
-            run_time=0.4,
+            run_time=0.35,
         )
-        self.wait(1)
+        self.wait(0.1)
+
+        # 4c: copies fly → est[4] blue + est[1,3] → white; boxes out
+        copies_T0 = VGroup(*[row_mobs[ri][4].copy() for ri in t0_rows])
+        self.add(copies_T0)
+        tgt_T0 = est[4].get_center()
+        self.play(
+            *[copies_T0[i].animate.move_to(tgt_T0).scale(0.4).set_opacity(0)
+              for i in range(len(t0_rows))],
+            est[4].animate.set_color(BLUE_LIGHT),
+            FadeOut(rect_idt4), FadeOut(cell_rects_I0),
+            run_time=0.5,
+        )
+        self.wait(0.15)
+
+        # 4d: idt[4] → white, est[4] → white, cells restore
+        self.play(
+            idt[4].animate.set_color(_W),
+            est[4].animate.set_color(_W),
+            *[row_mobs[ri][4].animate.set_color(orig_col(4, ri)) for ri in t0_rows],
+            *[row_mobs[ri][4].animate.set_color(orig_col(4, ri)) for ri in t1_rows],
+            run_time=0.35,
+        )
+        self.wait(0.3)
+        self.next_slide()
+
+        # ── Step 5: combine est[2]+est[4] → reveal -0.16 in red → white ──────
+
+        # 5a: flash est[2] and est[4] blue (showing they are the inputs)
+        self.play(
+            est[2].animate.set_color(BLUE_LIGHT),
+            est[4].animate.set_color(BLUE_LIGHT),
+            run_time=0.3,
+        )
+        self.wait(0.2)
+
+        # 5b: copies fly to -0.16 position; = and -0.16 emerge in BLUE
+        copies_combine = VGroup(est[2].copy(), est[4].copy())
+        self.add(copies_combine)
+        tgt_diff = est[6].get_center()
+        self.play(
+            copies_combine[0].animate.move_to(tgt_diff).scale(0.4).set_opacity(0),
+            copies_combine[1].animate.move_to(tgt_diff).scale(0.4).set_opacity(0),
+            est[5].animate.set_opacity(1),
+            est[6].animate.set_opacity(1).set_color(BLUE_LIGHT),
+            run_time=0.5,
+        )
+        self.wait(0.3)
+
+        # 5c: all settle to white
+        self.play(
+            est[2].animate.set_color(_W),
+            est[4].animate.set_color(_W),
+            est[6].animate.set_color(_W),
+            run_time=0.45,
+        )
+        self.wait(0.4)
         self.next_slide()
