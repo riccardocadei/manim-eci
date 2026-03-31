@@ -1,0 +1,10 @@
+__pycache__/*
+*/__pycache__/*
+.claude/*
+*.mp4
+*.mkv
+.DS_Store
+
+media/*
+output/*
+slides/*
