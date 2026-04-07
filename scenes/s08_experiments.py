@@ -120,7 +120,7 @@ def _build_panel(neuron_tag, neuron_display, y_center, img_x, img_h=0.60, img_ga
 
 # ── Scene ─────────────────────────────────────────────────────────────────────
 
-class S09Experiments(Slide):
+class S08Experiments(Slide):
     def construct(self):
         self.camera.background_color = BG
 

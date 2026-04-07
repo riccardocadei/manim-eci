@@ -302,7 +302,7 @@ class S06Paradox(Slide):
         # Rename title → "Paradox of Causal Inference"
         # Revert all colored nodes / arrows / flows back to white
         # ══════════════════════════════════════════════════════════════════════
-        new_title = Text("Paradox of Causal Inference", color=WHITE_TEXT).scale(TITLE_SCALE).to_edge(UP, buff=0.4)
+        new_title = Text("Paradox of Exploratory Causal Inference", color=WHITE_TEXT).scale(TITLE_SCALE).to_edge(UP, buff=0.4)
 
         revert_anims = [
             # z_m: red → white
@@ -322,7 +322,19 @@ class S06Paradox(Slide):
             revert_anims.append(secondary_flows[si].animate.set_fill(color=WHITE_TEXT, opacity=0.35))
 
         self.play(Transform(title, new_title), *revert_anims, run_time=1.0)
-        self.wait(0.5)
+        self.wait(0.3)
+
+        # ── Quick emphasis: flash all T→Z arrows ─────────────────────────────
+        all_arrows_group = VGroup(*arrows, arrow_m)
+        self.play(
+            all_arrows_group.animate.set_color(YELLOW_LIGHT).set_stroke(width=5),
+            run_time=0.5,
+        )
+        self.play(
+            all_arrows_group.animate.set_color(WHITE_TEXT).set_stroke(width=2.5),
+            run_time=0.5,
+        )
+        self.wait(0.3)
         self.next_slide()
 
         # ══════════════════════════════════════════════════════════════════════

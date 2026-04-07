@@ -132,16 +132,26 @@ class S03ECI(Slide):
         rect_e = Rectangle(width=ov_e.width, height=ov_e.height,
                             fill_color=BG, fill_opacity=0, stroke_width=0).move_to(X_c)
 
-        # ── Slide: gifs → T→Y DAG, emphasize "Causal Inference" in title ──────
-        # title[:11] = "Exploratory", title[11:] = " Causal Inference"
-        self.play(FadeOut(vids), FadeOut(example_title), run_time=0.8)
+        # ── Slide: gifs shrink smoothly into DAG node positions ──────────────
+        # Step 1: fade out labels and example title, keep gifs
+        self.play(
+            FadeOut(lbl_t), FadeOut(lbl_d), FadeOut(example_title),
+            run_time=0.5,
+        )
 
-        # ghost gifs behind T and Y are already added before DAG builds
+        # Step 2: shrink gifs and move them to DAG node positions
+        self.play(
+            vid_t.animate.scale_to_fit_height(1.8).move_to(T_c),
+            vid_d.animate.scale_to_fit_height(1.8).move_to(Y_c),
+            run_time=0.9,
+        )
+
+        # Step 3: swap large gifs for looping overlay gifs + dim them + grow DAG nodes
+        self.remove(vid_t, vid_d)
         self.add(ov_t, ov_y)
         self.bring_to_back(ov_t, ov_y)
         self.add(rect_t, rect_y)
 
-        # ghost gifs + build T→Y nodes + arrow
         self.play(
             rect_t.animate.set_fill(opacity=_ov_op),
             rect_y.animate.set_fill(opacity=_ov_op),

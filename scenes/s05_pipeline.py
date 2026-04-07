@@ -224,13 +224,88 @@ class S05Pipeline(Slide):
         q_single = MathTex("?", color=WHITE_TEXT).scale(0.70).move_to(hyp_anchor)
 
         # ── Transition: gifs → DAG ────────────────────────────────────────────
-        self.play(FadeOut(vids), run_time=0.6)
+        # Step 1: Fade out labels, shrink treatment vid → T node position
+        # Pre-place T_circ and T_lbl (invisible) so we know exact target
+        T_circ.set_opacity(0)
+        T_lbl.set_opacity(0)
+        self.add(T_circ, T_lbl)
 
-        # T node
+        # Shrink treatment video toward T position, fade its label
         self.play(
-            AnimationGroup(GrowFromCenter(T_circ), FadeIn(T_lbl)),
+            FadeOut(lbl_t, shift=DOWN * 0.3),
+            FadeOut(lbl_e, shift=DOWN * 0.3),
+            vid_t.animate.scale_to_fit_height(r_node * 2).move_to(T_circ),
             run_time=0.8,
         )
+
+        # Replace treatment vid with T node
+        self.play(
+            FadeOut(vid_t),
+            T_circ.animate.set_opacity(1),
+            T_lbl.animate.set_opacity(1),
+            run_time=0.5,
+        )
+
+        # Step 2: Show model extracting neuron activations from post-treatment
+        # Move effect vid to center-right & shrink slightly
+        model_pos = (T_circ.get_center() + n_circs.get_center()) / 2
+        model_lbl = Text("SAE", color=PURPLE_LIGHT).scale(0.38)
+        model_box = SurroundingRectangle(
+            model_lbl, color=PURPLE_LIGHT, buff=0.12,
+            stroke_width=1.8, corner_radius=0.08,
+        )
+        model_grp = VGroup(model_box, model_lbl).move_to(model_pos).shift(UP * 1.6)
+
+        self.play(
+            vid_e.animate.scale_to_fit_height(2.0).move_to(
+                model_grp.get_center() + UP * 1.6
+            ),
+            run_time=0.7,
+        )
+
+        # SAE box appears, arrow from vid_e into it
+        arr_into_model = Arrow(
+            vid_e.get_bottom() + DOWN * 0.05,
+            model_grp.get_top() + UP * 0.05,
+            color=PURPLE_LIGHT, buff=0, stroke_width=2.0,
+            max_tip_length_to_length_ratio=0.3,
+        )
+        self.play(
+            FadeIn(model_grp, scale=0.8),
+            Create(arr_into_model),
+            run_time=0.6,
+        )
+
+        # Arrow from model to Z column position + reveal Z nodes
+        z_col_center = VGroup(n_circs, z_m_circ).get_center()
+        arr_out_model = Arrow(
+            model_grp.get_bottom() + DOWN * 0.05,
+            np.array([z_col_center[0], model_grp.get_bottom()[1] - 0.8, 0]),
+            color=PURPLE_LIGHT, buff=0, stroke_width=2.0,
+            max_tip_length_to_length_ratio=0.3,
+        )
+
+        # Z label header
+        z_header = MathTex(r"\mathbf{Z}", color=WHITE_TEXT).scale(0.55)
+        z_header.move_to(arr_out_model.get_end() + DOWN * 0.15)
+
+        self.play(
+            Create(arr_out_model),
+            FadeIn(z_header, shift=DOWN * 0.2),
+            run_time=0.6,
+        )
+        self.wait(0.3)
+
+        # Step 3: Clean up model intermediary, reveal full DAG Z column
+        self.play(
+            FadeOut(vid_e),
+            FadeOut(arr_into_model),
+            FadeOut(model_grp),
+            FadeOut(arr_out_model),
+            FadeOut(z_header),
+            run_time=0.5,
+        )
+
         # Z₁…Z₅ with labels inside + primary Sankey ribbon + concept labels
         self.play(
             LaggedStart(*[

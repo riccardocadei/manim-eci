@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from config import *
 
 
-class S11Conclusion(Slide):
+class S10Conclusion(Slide):
     def construct(self):
         self.camera.background_color = BG
 
