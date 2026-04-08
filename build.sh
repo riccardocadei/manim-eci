@@ -8,7 +8,7 @@
 #   ./build.sh clean        → remove all build artifacts (media/, slides/, output/)
 
 set -e
-CONDA_ENV="visualize"
+CONDA_ENV="${CONDA_ENV:-visualize}"
 OUT_DIR="output"
 
 SCENES=(
