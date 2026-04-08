@@ -18,11 +18,10 @@ class S10Conclusion(Slide):
         # ── Take-away 1 ─────────────────────────────────────────────────────
         bullet_1 = Text("1.", color=WHITE_TEXT).scale(BODY_SCALE)
         text_1 = Text(
-            "Dictionary Learning enables Exploratory Causal Inference in latent space",
+            "Dictionary Learning enables Exploratory Causal Inference",
             color=WHITE_TEXT,
         ).scale(BODY_SCALE)
-        tag_1 = Text("(new?)", color=YELLOW_LIGHT).scale(SMALL_SCALE)
-        row_1 = VGroup(bullet_1, text_1, tag_1).arrange(RIGHT, buff=0.18)
+        row_1 = VGroup(bullet_1, text_1).arrange(RIGHT, buff=0.18)
         row_1.move_to(UP * 0.6)
 
         self.play(FadeIn(row_1, shift=RIGHT * 0.15), run_time=0.8)

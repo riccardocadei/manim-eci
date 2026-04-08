@@ -115,7 +115,7 @@ def _neuron_row(neuron_id, quiet_folder, top_folder, interp_lines, y_center):
     interp.move_to([5.5, y_center, 0])
 
     # "Interpretation" header aligned vertically with "activated"
-    hdr_interp = Text("Interpretation", color=GRAY_TEXT).scale(SMALL_SCALE * 0.9)
+    hdr_interp = Text("interpretation", color=GRAY_TEXT).scale(SMALL_SCALE * 0.9)
     hdr_interp.move_to([5.5, hdr_top.get_y(), 0])
 
     # Green check badge below interpretation
@@ -170,18 +170,20 @@ class S09RealWorld(Slide):
             LaggedStart(*[FadeIn(im, shift=UP * 0.1) for im in grids1[0]], lag_ratio=0.04),
             run_time=0.8,
         )
+        # Start GIF updaters as soon as grids appear
+        _start_gif_updaters(anim1)
         self.play(
             FadeIn(labels1[2]),  # "activated" header
-            FadeIn(labels1[4]),  # "Interpretation" header
             LaggedStart(*[FadeIn(im, shift=UP * 0.1) for im in grids1[1]], lag_ratio=0.04),
             run_time=0.8,
         )
-        self.play(Write(labels1[3]), run_time=0.5)  # interpretation
+        self.play(
+            FadeIn(labels1[4]),  # "interpretation" header
+            Write(labels1[3]),   # interpretation text
+            run_time=0.8,
+        )
         self.wait(1.0)
         self.play(FadeIn(labels1[5], scale=1.5), run_time=0.4)  # green check
-
-        # Start GIF updaters and loop
-        _start_gif_updaters(anim1)
         self.wait(1.6)
         self.next_slide(loop=True)
         self.wait(1.6)
@@ -214,18 +216,20 @@ class S09RealWorld(Slide):
             LaggedStart(*[FadeIn(im, shift=UP * 0.1) for im in grids2[0]], lag_ratio=0.04),
             run_time=0.8,
         )
+        # Start GIF updaters as soon as grids appear
+        _start_gif_updaters(anim2)
         self.play(
             FadeIn(labels2[2]),  # "activated" header
-            FadeIn(labels2[4]),  # "Interpretation" header
             LaggedStart(*[FadeIn(im, shift=UP * 0.1) for im in grids2[1]], lag_ratio=0.04),
             run_time=0.8,
         )
-        self.play(Write(labels2[3]), run_time=0.5)  # interpretation
+        self.play(
+            FadeIn(labels2[4]),  # "interpretation" header
+            Write(labels2[3]),   # interpretation text
+            run_time=0.8,
+        )
         self.wait(1.0)
         self.play(FadeIn(labels2[5], scale=1.5), run_time=0.4)  # green check
-
-        # Start GIF updaters for neuron 550 and loop
-        _start_gif_updaters(anim2)
         self.wait(1.6)
         self.next_slide(loop=True)
         self.wait(1.6)

@@ -126,9 +126,9 @@ class S08Experiments(Slide):
 
         # ── Title ─────────────────────────────────────────────────────────────
         title = Text(
-            "Proof of concept: CelebA",
+            "Results: semi-synthetic (CelebA+)",
             color=WHITE_TEXT,
-            t2s={"CelebA": ITALIC},
+            t2s={"semi-synthetic (CelebA+)": ITALIC},
         ).scale(TITLE_SCALE).to_edge(UP, buff=0.4)
 
         self.play(Write(title), run_time=0.7)
@@ -268,9 +268,9 @@ class S08Experiments(Slide):
         fig_trend.set_height(FIG_H).move_to(fig_current.get_center())
         fig_trend.set_opacity(0)
 
-        self.remove(fig_current)
         self.add(fig_trend)
         self.play(fig_trend.animate.set_opacity(1), run_time=0.8)
+        self.remove(fig_current)
         fig_current = fig_trend
 
         self.wait(0.4)
