@@ -2,6 +2,7 @@ __pycache__/*
 */__pycache__/*
 .claude/*
 *.mp4
+!docs/**/*.mp4
 *.mkv
 .DS_Store
 *research_question*
