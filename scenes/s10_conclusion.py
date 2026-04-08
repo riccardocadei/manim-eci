@@ -16,9 +16,9 @@ class S10Conclusion(Slide):
         self.next_slide()
 
         # ── Take-away 1 ─────────────────────────────────────────────────────
-        bullet_1 = Text("1.", color=GREEN_LIGHT).scale(BODY_SCALE)
+        bullet_1 = Text("1.", color=WHITE_TEXT).scale(BODY_SCALE)
         text_1 = Text(
-            "Dictionary Learning enables Exploratory Causal Inference",
+            "Dictionary Learning enables Exploratory Causal Inference in latent space",
             color=WHITE_TEXT,
         ).scale(BODY_SCALE)
         tag_1 = Text("(new?)", color=YELLOW_LIGHT).scale(SMALL_SCALE)
@@ -30,9 +30,9 @@ class S10Conclusion(Slide):
         self.next_slide()
 
         # ── Take-away 2 ─────────────────────────────────────────────────────
-        bullet_2 = Text("2.", color=GREEN_LIGHT).scale(BODY_SCALE)
+        bullet_2 = Text("2.", color=WHITE_TEXT).scale(BODY_SCALE)
         text_2 = Text(
-            "Neural Effect Search (ours) mitigates imperfect Dictionary Learning",
+            "Neural Effect Search (ours) mitigates imperfect representations",
             color=WHITE_TEXT,
         ).scale(BODY_SCALE)
         row_2 = VGroup(bullet_2, text_2).arrange(RIGHT, buff=0.18)

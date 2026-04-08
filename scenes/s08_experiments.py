@@ -242,25 +242,67 @@ class S08Experiments(Slide):
         )
         self.play(FadeOut(stuff_to_clear), run_time=0.6)
 
-        # Step 1: baselines bar plot grows in
-        fig_baselines = ImageMobject(
-            os.path.join(EXPERIMENT_DIR, "figure5_baselines.png")
-        )
-        fig_baselines.set_height(5.8).next_to(title, DOWN, buff=0.3)
+        FRAMES_DIR = os.path.join(EXPERIMENT_DIR, "frames")
+        FIG_H = 5.2
 
-        self.play(FadeIn(fig_baselines, shift=UP * 0.15), run_time=0.8)
+        # ── Phase 1: bars grow gradually (frame sequence) ────────────────
+        N_FRAMES = 15
+        grow_frames = []
+        for i in range(N_FRAMES):
+            img = ImageMobject(os.path.join(FRAMES_DIR, f"grow_3m_{i:02d}.png"))
+            img.set_height(FIG_H).next_to(title, DOWN, buff=0.3)
+            grow_frames.append(img)
+
+        # Show first frame, then animate through the rest
+        self.add(grow_frames[0])
+        for i in range(1, N_FRAMES):
+            self.remove(grow_frames[i - 1])
+            self.add(grow_frames[i])
+            self.wait(1/15)
+        fig_current = grow_frames[-1]
         self.wait(0.3)
         self.next_slide()
 
-        # Step 2: crossfade to NES-highlighted version (baselines dim, NES pops)
-        fig_nes = ImageMobject(
-            os.path.join(EXPERIMENT_DIR, "figure5_nes_highlight.png")
-        )
-        fig_nes.set_height(5.8).move_to(fig_baselines.get_center())
+        # ── Phase 2: trend line appears → ECI paradox ────────────────────
+        fig_trend = ImageMobject(os.path.join(FRAMES_DIR, "trend.png"))
+        fig_trend.set_height(FIG_H).move_to(fig_current.get_center())
+        fig_trend.set_opacity(0)
 
-        self.play(
-            FadeOut(fig_baselines, run_time=0.4),
-            FadeIn(fig_nes, run_time=0.4),
-        )
+        self.remove(fig_current)
+        self.add(fig_trend)
+        self.play(fig_trend.animate.set_opacity(1), run_time=0.8)
+        fig_current = fig_trend
+
+        self.wait(0.4)
+        self.next_slide()
+
+        # ── Phase 2b: ECI paradox label ──────────────────────────────────
+        paradox_text = Text(
+            "Exploratory Causal Inference Paradox",
+            color=RED_LIGHT,
+            t2s={"Exploratory Causal Inference Paradox": ITALIC},
+        ).scale(BODY_SCALE * 1.1)
+        paradox_text.next_to(fig_current, DOWN, buff=0.25)
+
+        self.play(Write(paradox_text), run_time=0.7)
+        self.wait(0.3)
+        self.next_slide()
+
+        # ── Phase 3: NES grows in (frame sequence) ───────────────────────
+        self.play(FadeOut(paradox_text), run_time=0.3)
+
+        nes_frames = []
+        for i in range(N_FRAMES):
+            img = ImageMobject(os.path.join(FRAMES_DIR, f"add_nes_{i:02d}.png"))
+            img.set_height(FIG_H).move_to(fig_current.get_center())
+            nes_frames.append(img)
+
+        self.remove(fig_current)
+        self.add(nes_frames[0])
+        for i in range(1, N_FRAMES):
+            self.remove(nes_frames[i - 1])
+            self.add(nes_frames[i])
+            self.wait(1/15)
+
         self.wait(0.4)
         self.next_slide()

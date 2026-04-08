@@ -301,7 +301,7 @@ class S07NES(Slide):
 
         # Then show estimates
         val2_z2 = MathTex(r"\approx 0.08", color=WHITE_TEXT).scale(0.28)
-        val2_z3 = MathTex(r"\approx 0.73", color=WHITE_TEXT).scale(0.28)
+        val2_z3 = MathTex(r"\approx 0.51", color=WHITE_TEXT).scale(0.28)
         val2_z2.next_to(form2_z2, RIGHT, buff=0.08)
         val2_z3.next_to(form2_z3, RIGHT, buff=0.08)
 
@@ -366,12 +366,16 @@ class S07NES(Slide):
         self.play(FadeIn(form3_z2, shift=LEFT * 0.1), run_time=0.5)
         self.wait(0.3)
 
-        # Show estimate ≈ 0
-        val3_z2 = MathTex(r"\approx 0.02", color=DIM_GRAY).scale(0.26)
+        # Show estimate ≈ 0 — first in white, then dim
+        val3_z2 = MathTex(r"\approx 0.02", color=WHITE_TEXT).scale(0.26)
         val3_z2.next_to(form3_z2, RIGHT, buff=0.08)
 
+        self.play(FadeIn(val3_z2, shift=LEFT * 0.06), run_time=0.5)
+        self.wait(0.6)
+
+        # Now dim everything: formula, value, and Z₂ node
         self.play(
-            FadeIn(val3_z2, shift=LEFT * 0.06),
+            val3_z2.animate.set_color(DIM_GRAY),
             form3_z2.animate.set_color(DIM_GRAY),
             Z2[0].animate.set_stroke(DIM_GRAY, width=2.0),
             Z2[1].animate.set_color(DIM_GRAY),

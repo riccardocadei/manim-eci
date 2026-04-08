@@ -9,7 +9,7 @@ class S11ThankYou(Slide):
     def construct(self):
         self.camera.background_color = BG
 
-        title = Text("Thank You for your attention", color=WHITE_TEXT).scale(TITLE_SCALE)
+        title = Text("Thank you for your attention", color=WHITE_TEXT).scale(TITLE_SCALE)
         title.move_to(ORIGIN)
 
         self.play(FadeIn(title))

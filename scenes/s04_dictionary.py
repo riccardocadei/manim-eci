@@ -388,21 +388,10 @@ class S04Dictionary(Slide):
             *ent_only_anims(PATTERNS[ent_pat_idx % len(PATTERNS)]),
             run_time=0.4, rate_func=linear,
         )
-        self.play(tracker.animate.set_value(tracker.get_value() + 3.0), run_time=3.0, rate_func=linear)
 
         # ── Dynamic: video + entangled sectors + sparse concepts ───────────────
-        # When concept c fires: the sector carrying that concept's color brightens
-        # in each neuron (but at a DIFFERENT sector position per neuron, since
-        # colors are shuffled) → visually distinct activation per neuron.
+        # Both entangled and sparse start animating immediately (no dead gap).
         T0 = tracker.get_value()
-        PATTERNS = [
-            [0.85, 0.0,  0.0,  0.0,  0.0,  0.0,  0.80, 0.0 ],
-            [0.0,  0.90, 0.0,  0.85, 0.0,  0.0,  0.0,  0.55],
-            [0.0,  0.0,  0.80, 0.0,  0.95, 0.0,  0.0,  0.0 ],
-            [0.75, 0.0,  0.65, 0.0,  0.0,  0.0,  0.0,  0.0 ],
-            [0.0,  0.0,  0.0,  0.0,  0.0,  0.90, 0.0,  0.70],
-            [0.0,  0.85, 0.0,  0.90, 0.0,  0.0,  0.0,  0.0 ],
-        ]
 
         def all_anims(pattern):
             anims = []

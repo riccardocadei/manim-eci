@@ -109,6 +109,7 @@ class S02CausalityPrimer(Slide):
                            color=_W).scale(TITLE_SCALE).to_edge(UP, buff=0.4)
         self.play(Write(motiv_title), run_time=0.8)
         self.wait(0.3)
+        self.next_slide()
 
         # ── ChatGPT box — dark mode ──────────────────────────────────────────
         _BXW  = 9.0

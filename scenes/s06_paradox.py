@@ -11,7 +11,7 @@ class S06Paradox(Slide):
         self.camera.background_color = BG
 
         # ── Title ─────────────────────────────────────────────────────────────
-        title = slide_title("Challenge")
+        title = slide_title("Exploratory Causal Inference Paradox", color=WHITE_TEXT)
         self.play(Write(title), run_time=0.8)
         self.wait(0.5)
         self.next_slide()
@@ -299,11 +299,8 @@ class S06Paradox(Slide):
         self.next_slide()
 
         # ══════════════════════════════════════════════════════════════════════
-        # Rename title → "Paradox of Causal Inference"
         # Revert all colored nodes / arrows / flows back to white
         # ══════════════════════════════════════════════════════════════════════
-        new_title = Text("Paradox of Exploratory Causal Inference", color=WHITE_TEXT).scale(TITLE_SCALE).to_edge(UP, buff=0.4)
-
         revert_anims = [
             # z_m: red → white
             z_m_circ.animate.set_stroke(color=WHITE_TEXT, width=3.0, opacity=1.0),
@@ -321,21 +318,21 @@ class S06Paradox(Slide):
         for si in sec_to_groom_indices:
             revert_anims.append(secondary_flows[si].animate.set_fill(color=WHITE_TEXT, opacity=0.35))
 
-        self.play(Transform(title, new_title), *revert_anims, run_time=1.0)
-        self.wait(0.3)
-
-        # ── Quick emphasis: flash all T→Z arrows ─────────────────────────────
-        all_arrows_group = VGroup(*arrows, arrow_m)
-        self.play(
-            all_arrows_group.animate.set_color(YELLOW_LIGHT).set_stroke(width=5),
-            run_time=0.5,
-        )
-        self.play(
-            all_arrows_group.animate.set_color(WHITE_TEXT).set_stroke(width=2.5),
-            run_time=0.5,
-        )
+        self.play(*revert_anims, run_time=1.0)
         self.wait(0.3)
         self.next_slide()
+
+        # ── Quick emphasis: flash all T→Z arrows (scale pulse, no color) ─────
+        all_arrows_group = VGroup(*arrows, arrow_m)
+        self.play(
+            all_arrows_group.animate.set_stroke(width=5.5),
+            run_time=0.4,
+        )
+        self.play(
+            all_arrows_group.animate.set_stroke(width=2.5),
+            run_time=0.4,
+        )
+        self.wait(0.3)
 
         # ══════════════════════════════════════════════════════════════════════
         # All concept labels → scale 0.42, with ✓/✗ symbols
