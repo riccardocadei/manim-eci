@@ -1,8 +1,6 @@
-# Presentation: Exploratory Causal Inference in SAEnce 
+# Presentation: *Exploratory Causal Inference in SAEnce* 
 
-[Interactive slides](https://www.riccardocadei.com/manim-eci/presentation.html) for the oral presentation of [*Exploratory Causal Inference in SAEnce*](https://arxiv.org/abs/2510.14073) at [ICLR 2026](https://iclr.cc/) by Riccardo Cadei.
-
-Built with [Manim Community](https://www.manim.community/) and [manim-slides](https://github.com/jeertmans/manim-slides), the presentation renders animated scenes into a self-contained HTML slide deck.
+[Interactive slides](https://www.riccardocadei.com/manim-eci/presentation.html) for the oral presentation of [*Exploratory Causal Inference in SAEnce*](https://arxiv.org/abs/2510.14073) at [ICLR 2026](https://iclr.cc/) by Riccardo Cadei. Built with [Manim Community](https://www.manim.community/) and [manim-slides](https://github.com/jeertmans/manim-slides), the presentation renders animated scenes into a self-contained HTML slide deck.
 
 ## Build
 
