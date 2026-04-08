@@ -1,22 +1,8 @@
 # Presentation: Exploratory Causal Inference in SAEnce 
 
-Interactive slides for the oral presentation of *Exploratory Causal Inference in SAEnce* at ICLR 2026.
-
-[[ICLR]](https://openreview.net/forum?id=BFMCkJbJXx) [[arXiv]](https://arxiv.org/abs/2510.14073) [[Presentation]](https://www.riccardocadei.com/manim-eci/presentation.html)
+[Interactive slides](https://www.riccardocadei.com/manim-eci/presentation.html) for the oral presentation of [*Exploratory Causal Inference in SAEnce*](https://arxiv.org/abs/2510.14073) at [ICLR 2026](https://iclr.cc/) by Riccardo Cadei.
 
 Built with [Manim Community](https://www.manim.community/) and [manim-slides](https://github.com/jeertmans/manim-slides), the presentation renders animated scenes into a self-contained HTML slide deck.
-
-## Citation
-
-```bibtex
-@inproceedings{mencattini2026exploratory,
-  title     = {Exploratory Causal Inference in SAEnce},
-  author    = {Tommaso Mencattini and Riccardo Cadei and Francesco Locatello},
-  booktitle = {The Fourteenth International Conference on Learning Representations},
-  year      = {2026},
-  url       = {https://openreview.net/forum?id=BFMCkJbJXx}
-}
-```
 
 ## Build
 
@@ -46,3 +32,16 @@ export CONDA_ENV=myenv
 ```
 
 Output is written to `output/presentation.html`.
+
+
+## Reference
+
+```bibtex
+@inproceedings{mencattini2026exploratory,
+  title     = {Exploratory Causal Inference in SAEnce},
+  author    = {Tommaso Mencattini and Riccardo Cadei and Francesco Locatello},
+  booktitle = {The Fourteenth International Conference on Learning Representations},
+  year      = {2026},
+  url       = {https://openreview.net/forum?id=Ml8t8kQMUP}
+}
+```
