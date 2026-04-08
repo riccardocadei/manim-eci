@@ -77,6 +77,9 @@ if [ "$1" = "html" ]; then
   echo "Converting to $OUT_DIR/presentation.html..."
   mkdir -p "$OUT_DIR"
   run_manim manim-slides convert $ALL_CLASSES "$OUT_DIR/presentation.html"
+  echo "Copying to docs/ for GitHub Pages..."
+  cp "$OUT_DIR/presentation.html" docs/presentation.html
+  [ -d "$OUT_DIR/presentation_assets" ] && cp -r "$OUT_DIR/presentation_assets/"* docs/presentation_assets/
   open "$OUT_DIR/presentation.html"
   exit 0
 fi
@@ -117,4 +120,7 @@ done
 
 echo "Converting to $OUT_DIR/presentation.html..."
 run_manim manim-slides convert $ALL_CLASSES "$OUT_DIR/presentation.html"
+echo "Copying to docs/ for GitHub Pages..."
+cp "$OUT_DIR/presentation.html" docs/presentation.html
+[ -d "$OUT_DIR/presentation_assets" ] && cp -r "$OUT_DIR/presentation_assets/"* docs/presentation_assets/
 open "$OUT_DIR/presentation.html"
