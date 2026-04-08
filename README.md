@@ -2,34 +2,36 @@
 
 [Interactive slides](https://www.riccardocadei.com/manim-eci/presentation.html) for the oral presentation of [*Exploratory Causal Inference in SAEnce*](https://arxiv.org/abs/2510.14073) at [ICLR 2026](https://iclr.cc/) by Riccardo Cadei. Built with [Manim Community](https://www.manim.community/) and [manim-slides](https://github.com/jeertmans/manim-slides), the presentation renders animated scenes into a self-contained HTML slide deck.
 
-## Build
+## Reproduce the Presentation Locally
 
-**Prerequisites:** [Conda](https://docs.conda.io/) with an environment containing `manim` and `manim-slides`.
+### 1. Set up the environment
 
-By default the build script uses a conda environment called `visualize`. Set the `CONDA_ENV` variable to use a different one:
-
-```bash
-export CONDA_ENV=myenv
-```
+Install [Conda](https://docs.conda.io/), then create an environment with the required packages:
 
 ```bash
-# Render all scenes and open the full presentation
-./build.sh
-
-# Render a single scene (e.g. s01) and open it
-./build.sh s01
-
-# Choose quality: low, medium, high (default), production, 4k
-./build.sh s03 low
-
-# Convert already-rendered scenes to HTML (skip rendering)
-./build.sh html
-
-# Remove all build artifacts (media/, slides/, output/)
-./build.sh clean
+conda create -n visualize python=3.11
+conda activate visualize
+pip install manim manim-slides[pyqt6]
 ```
 
-Output is written to `output/presentation.html`.
+> If your environment has a different name, tell the build script with `export CONDA_ENV=myenv`.
+
+### 2. Render and open the slides
+
+```bash
+./build.sh                # render all scenes and open the presentation
+```
+
+The output is saved to `output/presentation.html`.
+
+### 3. Optional commands
+
+```bash
+./build.sh s01            # render a single scene (e.g. s01) and open it
+./build.sh s03 low        # choose quality: low | medium | high (default) | production | 4k
+./build.sh html           # convert already-rendered scenes to HTML (skip rendering)
+./build.sh clean          # remove all build artifacts (media/, slides/, output/)
+```
 
 
 ## Reference
