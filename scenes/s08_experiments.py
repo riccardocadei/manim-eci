@@ -141,18 +141,35 @@ class S08Experiments(Slide):
         CHART_SHIFT =  0.35
         Y1, Y2      =  1.3, -2.2
 
-        # ── Effect 1: bar chart ───────────────────────────────────────────────
-        chart1 = _bar_chart(HAT_DATA)
-        chart1.move_to([CHART_X, Y1, 0])
-
+        # ── Show both effect titles first ─────────────────────────────────────
         lbl1 = Text(
             "Effect 1: wearing hat", color=WHITE_TEXT,
             t2s={"wearing hat": ITALIC},
         ).scale(BODY_SCALE)
-        lbl1.next_to(chart1, UP, buff=0.20, aligned_edge=LEFT)
+        lbl1.move_to([CHART_X, Y1 + 1.3, 0], aligned_edge=LEFT)
+
+        lbl2 = Text(
+            "Effect 2: wearing sunglasses", color=WHITE_TEXT,
+            t2s={"wearing sunglasses": ITALIC},
+        ).scale(BODY_SCALE)
+        lbl2.move_to([CHART_X, Y2 + 1.3, 0], aligned_edge=LEFT)
 
         self.play(
-            FadeIn(lbl1),
+            FadeIn(lbl1, shift=RIGHT * 0.1),
+            FadeIn(lbl2, shift=RIGHT * 0.1),
+            run_time=0.7,
+        )
+        self.wait(0.3)
+        self.next_slide()
+
+        # ── Effect 1: bar chart ───────────────────────────────────────────────
+        chart1 = _bar_chart(HAT_DATA)
+        chart1.move_to([CHART_X, Y1, 0])
+        lbl1.generate_target()
+        lbl1.target.next_to(chart1, UP, buff=0.20, aligned_edge=LEFT)
+
+        self.play(
+            MoveToTarget(lbl1),
             LaggedStart(*[FadeIn(r, shift=RIGHT * 0.06) for r in chart1], lag_ratio=0.04),
             run_time=1.0,
         )
@@ -194,15 +211,11 @@ class S08Experiments(Slide):
         # ── Effect 2: bar chart ───────────────────────────────────────────────
         chart2 = _bar_chart(GLASSES_DATA)
         chart2.move_to([CHART_X, Y2, 0])
-
-        lbl2 = Text(
-            "Effect 2: wearing sunglasses", color=WHITE_TEXT,
-            t2s={"wearing sunglasses": ITALIC},
-        ).scale(BODY_SCALE)
-        lbl2.next_to(chart2, UP, buff=0.20, aligned_edge=LEFT)
+        lbl2.generate_target()
+        lbl2.target.next_to(chart2, UP, buff=0.20, aligned_edge=LEFT)
 
         self.play(
-            FadeIn(lbl2),
+            MoveToTarget(lbl2),
             LaggedStart(*[FadeIn(r, shift=RIGHT * 0.06) for r in chart2], lag_ratio=0.04),
             run_time=1.0,
         )

@@ -13,7 +13,7 @@ OUT_DIR="output"
 
 SCENES=(
   "scenes/s01_title.py            S01Title           s01"
-  "scenes/s02_causality_primer.py S02CausalityPrimer s02"
+  "scenes/s02_motivation.py       S02Motivation      s02"
   "scenes/s03_eci.py              S03ECI             s03"
   "scenes/s04_dictionary.py       S04Dictionary      s04"
   "scenes/s05_pipeline.py         S05Pipeline        s05"

@@ -15,16 +15,33 @@ EFRAMES  = os.path.join(ANTS_DIR, "effect_frames")
 # ── VideoPlayer ────────────────────────────────────────────────────────────────
 
 class VideoPlayer(ImageMobject):
-    def __init__(self, frames_dir, fps=10, frame_start=None, frame_end=None, **kwargs):
+    def __init__(self, frames_dir, fps=10, frame_start=None, frame_end=None,
+                 square_crop=False, **kwargs):
         paths = sorted(_glob.glob(os.path.join(frames_dir, "frame_*.png")))
         if frame_start is not None or frame_end is not None:
             s = frame_start if frame_start is not None else 0
             e = frame_end if frame_end is not None else len(paths)
             paths = paths[s:e]
-        self._arrays = [np.array(PILImage.open(p).convert("RGBA")) for p in paths]
+        arrays = [np.array(PILImage.open(p).convert("RGBA")) for p in paths]
+        if square_crop:
+            arrays = [self._crop_square(a) for a in arrays]
+            import tempfile
+            tmp = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+            PILImage.fromarray(arrays[0]).save(tmp.name)
+            init_path = tmp.name
+        else:
+            init_path = paths[0]
+        self._arrays = arrays
         self._fps = fps
         self._nf  = len(self._arrays)
-        super().__init__(paths[0], **kwargs)
+        super().__init__(init_path, **kwargs)
+
+    @staticmethod
+    def _crop_square(arr):
+        h, w = arr.shape[:2]
+        s = min(h, w)
+        y0, x0 = (h - s) // 2, (w - s) // 2
+        return arr[y0:y0 + s, x0:x0 + s]
 
     def set_time(self, t):
         self.pixel_array = self._arrays[int(t * self._fps) % self._nf]
@@ -37,60 +54,19 @@ class S03ECI(Slide):
     def construct(self):
         self.camera.background_color = BG
 
-        title = slide_title("Exploratory Causal Inference")
-        self.play(Write(title), run_time=0.8)
-        self.wait(0.5)
-        self.next_slide()
-
-        # ── Gifs: treatment (loops) + demo (plays once) ───────────────────────
-        t_fps,  t_nf = 10, 40    # treatment: 40 frames → 4 s loop
-        d_fps,  d_nf = 10, 331   # demo: 331 frames → 33.1 s
-
-        vid_t = VideoPlayer(TFRAMES, fps=t_fps).scale_to_fit_height(3.2)
-        vid_d = VideoPlayer(DFRAMES, fps=d_fps).scale_to_fit_height(3.2)
-
-        lbl_t = Text("treatment",                  color=GRAY_TEXT).scale(0.30)
-        lbl_d = Text("post-treatment observation", color=GRAY_TEXT).scale(0.30)
-
-        col_t = Group(vid_t, lbl_t).arrange(DOWN, buff=0.18)
-        col_d = Group(vid_d, lbl_d).arrange(DOWN, buff=0.18)
-        vids  = Group(col_t, col_d).arrange(RIGHT, buff=1.0).center().shift(DOWN * 0.4)
-
-        example_title = Text(
-            "Motivating Example: social immunity in ants",
-            t2s={"social immunity in ants": ITALIC},
-            color=WHITE_TEXT,
-        ).scale(BODY_SCALE)
-        example_title.next_to(vids, UP, buff=0.35).align_to(vids, LEFT)
-
-        tracker = ValueTracker(0)
-        vid_t.add_updater(lambda m: m.set_time(tracker.get_value()))
-        vid_d.add_updater(lambda m: m.set_time(tracker.get_value()))
-
-        demo_duration = d_nf / d_fps   # 33.1 s — demo plays once, treatment loops ~8×
-
-        self.play(FadeIn(vids), FadeIn(example_title, shift=DOWN * 0.06), run_time=1.2)
-        self.play(
-            tracker.animate.set_value(demo_duration),
-            run_time=demo_duration,
-            rate_func=linear,
-        )
-        vid_t.clear_updaters()
-        vid_d.clear_updaters()
-        self.next_slide()
-
-        # ── Build DAG (positions computed for full T→Y→X layout) ─────────────
+        # ── Recreate s02 end state ───────────────────────────────────────────
+        # Title with "Exploratory" dimmed, T→Y DAG, ghost GIF underlays
         r, fs = 0.48, 0.62
+        t_fps = 10
+
         T_pos = np.array([-2.5,  0.5, 0])
         Y_pos = np.array([ 2.0,  0.5, 0])
         X_pos = np.array([ 0.0, -1.6, 0])
 
         T_c = Circle(radius=r, color=WHITE_TEXT, stroke_width=3.5).move_to(T_pos)
         Y_c = Circle(radius=r, color=WHITE_TEXT, stroke_width=3.5).move_to(Y_pos)
-        X_c = Circle(radius=r, color=WHITE_TEXT, stroke_width=3.5).move_to(X_pos)
         T_l = MathTex("T", color=WHITE_TEXT).scale(fs).move_to(T_c)
         Y_l = MathTex("Y", color=WHITE_TEXT).scale(fs).move_to(Y_c)
-        X_l = MathTex("X", color=WHITE_TEXT).scale(fs).move_to(X_c)
 
         arr_TY = Arrow(
             T_c.get_right() + RIGHT * 0.08,
@@ -98,100 +74,98 @@ class S03ECI(Slide):
             color=WHITE_TEXT, buff=0, stroke_width=5,
             max_tip_length_to_length_ratio=0.18,
         )
-        _dv = X_pos - Y_pos
+        q_TY = MathTex("?", color=WHITE_TEXT).scale(fs * 1.10).next_to(arr_TY, UP, buff=0.12)
+
+        # Invisible X anchor for consistent centering (matches s02)
+        _x_anchor = Circle(radius=r, stroke_opacity=0, fill_opacity=0).move_to(X_pos)
+        dag_full = VGroup(T_c, T_l, Y_c, Y_l, arr_TY, q_TY, _x_anchor)
+        dag_full.center().shift(DOWN * 0.3)
+
+        # Title with "Exploratory" dimmed (matching s02 end state)
+        eci_title = Text(
+            "Exploratory Causal Inference",
+            color=WHITE_TEXT,
+        ).scale(TITLE_SCALE).to_edge(UP, buff=0.4)
+        eci_title[:11].set_opacity(0.25)
+
+        # Ghost GIF underlays
+        _ghost_op = 0.18
+        _ov_op    = 1 - _ghost_op
+
+        ov_t = VideoPlayer(TFRAMES, fps=t_fps).scale_to_fit_height(1.8).move_to(T_c)
+        ov_d = VideoPlayer(DFRAMES, fps=t_fps, frame_start=71, frame_end=211,
+                           square_crop=True).scale_to_fit_height(1.8).move_to(Y_c)
+
+        rect_t = Rectangle(width=ov_t.width, height=ov_t.height,
+                           fill_color=BG, fill_opacity=_ov_op, stroke_width=0).move_to(T_c)
+        rect_d = Rectangle(width=ov_d.width, height=ov_d.height,
+                           fill_color=BG, fill_opacity=_ov_op, stroke_width=0).move_to(Y_c)
+
+        self.add(ov_t, ov_d, rect_t, rect_d)
+        self.add(T_c, T_l, Y_c, Y_l, arr_TY, q_TY, eci_title)
+
+        # ── Slide: reveal "Exploratory", Y → "?", add X with effect GIF ─────
+
+        # Prepare new elements
+        X_c = Circle(radius=r, color=WHITE_TEXT, stroke_width=3.5).move_to(X_pos)
+        X_l = MathTex("X", color=WHITE_TEXT).scale(fs).move_to(X_c)
+
+        # X position is already consistent — _x_anchor was part of dag_full
+        # when it was centered, so it absorbed the same transform.
+        X_c.move_to(_x_anchor)
+        X_l.move_to(X_c)
+
+        _dv = X_c.get_center() - Y_c.get_center()
         _dv = _dv / np.linalg.norm(_dv)
         arr_YX = Arrow(
-            Y_pos + _dv * (r + 0.08),
-            X_pos - _dv * (r + 0.08),
+            Y_c.get_center() + _dv * (r + 0.08),
+            X_c.get_center() - _dv * (r + 0.08),
             color=WHITE_TEXT, buff=0, stroke_width=5,
             max_tip_length_to_length_ratio=0.18,
         )
 
-        # Center full dag so T/Y/X positions are consistent across both slides
-        dag = VGroup(T_c, T_l, Y_c, Y_l, X_c, X_l, arr_TY, arr_YX)
-        dag.center().shift(DOWN * 0.3)
+        q_Y = MathTex("?", color=GRAY_TEXT).scale(fs).move_to(Y_c)
 
-        # ── Gif underlays (full opacity; dimmed later via dark overlay) ─────────
-        _ghost_op = 0.18          # final gif visibility
-        _ov_op    = 1 - _ghost_op  # overlay opacity that achieves ghost effect
-
-        ov_t = VideoPlayer(TFRAMES, fps=t_fps).scale_to_fit_height(1.8).move_to(T_c)
-        ov_y = VideoPlayer(DFRAMES, fps=d_fps, frame_start=71, frame_end=211).scale_to_fit_height(1.8).move_to(Y_c)
+        # Effect GIF overlay for X node
         ov_e = VideoPlayer(EFRAMES, fps=t_fps).scale_to_fit_height(1.8).move_to(X_c)
+        rect_e = Rectangle(width=ov_e.width, height=ov_e.height,
+                           fill_color=BG, fill_opacity=0, stroke_width=0).move_to(X_c)
 
         ov_tracker = ValueTracker(0)
         ov_t.add_updater(lambda m: m.set_time(ov_tracker.get_value()))
-        ov_y.add_updater(lambda m: m.set_time(ov_tracker.get_value()))
+        ov_d.add_updater(lambda m: m.set_time(ov_tracker.get_value()))
         ov_e.add_updater(lambda m: m.set_time(ov_tracker.get_value()))
 
-        # Dark rectangles that animate from transparent → opaque to ghost the gifs
-        rect_t = Rectangle(width=ov_t.width, height=ov_t.height,
-                            fill_color=BG, fill_opacity=0, stroke_width=0).move_to(T_c)
-        rect_y = Rectangle(width=ov_y.width, height=ov_y.height,
-                            fill_color=BG, fill_opacity=0, stroke_width=0).move_to(Y_c)
-        rect_e = Rectangle(width=ov_e.width, height=ov_e.height,
-                            fill_color=BG, fill_opacity=0, stroke_width=0).move_to(X_c)
-
-        # ── Slide: gifs shrink smoothly into DAG node positions ──────────────
-        # Step 1: fade out labels and example title, keep gifs
+        # Step 1: reveal "Exploratory" to full white
         self.play(
-            FadeOut(lbl_t), FadeOut(lbl_d), FadeOut(example_title),
-            run_time=0.5,
+            eci_title[:11].animate.set_opacity(1),
+            run_time=0.6,
         )
+        self.wait(0.3)
 
-        # Step 2: shrink gifs and move them to DAG node positions
-        self.play(
-            vid_t.animate.scale_to_fit_height(1.8).move_to(T_c),
-            vid_d.animate.scale_to_fit_height(1.8).move_to(Y_c),
-            run_time=0.9,
-        )
-
-        # Step 3: swap large gifs for looping overlay gifs + dim them + grow DAG nodes
-        self.remove(vid_t, vid_d)
-        self.add(ov_t, ov_y)
-        self.bring_to_back(ov_t, ov_y)
-        self.add(rect_t, rect_y)
-
-        self.play(
-            rect_t.animate.set_fill(opacity=_ov_op),
-            rect_y.animate.set_fill(opacity=_ov_op),
-            LaggedStart(
-                AnimationGroup(GrowFromCenter(T_c), FadeIn(T_l)),
-                AnimationGroup(GrowFromCenter(Y_c), FadeIn(Y_l)),
-                lag_ratio=0.35,
-            ),
-            run_time=1.5,
-        )
-        self.play(Create(arr_TY), run_time=0.7)
-        self.play(
-            ov_tracker.animate.set_value(8.0),
-            run_time=8.0,
-            rate_func=linear,
-        )
-        self.next_slide()
-
-        # ── Slide: add X, emphasize "Exploratory", Y → "?" ──────────────────
-        q_Y = MathTex("?", color=GRAY_TEXT).scale(fs).move_to(Y_c)
-
+        # Step 2: Y → "?", remove Y ghost gif, add effect gif at X,
+        #         grow X node + arrow (the old routine from git history)
         self.add(ov_e)
         self.bring_to_back(ov_e)
         self.add(rect_e)
 
-        # ghost X gif + add X node + arrow + swap Y→?  + remove Y ghost gif
         self.play(
             rect_e.animate.set_fill(opacity=_ov_op),
-            FadeOut(ov_y), FadeOut(rect_y),
+            FadeOut(ov_d), FadeOut(rect_d),
+            FadeOut(q_TY),
             ReplacementTransform(Y_l, q_Y),
             AnimationGroup(GrowFromCenter(X_c), FadeIn(X_l)),
             Create(arr_YX),
             run_time=1.4,
         )
+
+        # Let GIFs loop for a bit
         self.play(
-            ov_tracker.animate.set_value(ov_tracker.get_value() + 8.0),
+            ov_tracker.animate.set_value(8.0),
             run_time=8.0,
             rate_func=linear,
         )
         ov_t.clear_updaters()
-        ov_y.clear_updaters()
+        ov_d.clear_updaters()
         ov_e.clear_updaters()
         self.next_slide()
