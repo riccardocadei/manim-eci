@@ -12,6 +12,13 @@ class S11ThankYou(Slide):
         title = Text("Thank you for your attention", color=WHITE_TEXT).scale(TITLE_SCALE)
         title.move_to(ORIGIN)
 
+        poster = Text(
+            "Poster Session: Friday 3:15-5:45pm, Pavillon 3 #105",
+            color=GRAY_TEXT,
+        ).scale(BODY_SCALE)
+        poster.next_to(title, DOWN, buff=0.6)
+
         self.play(FadeIn(title))
+        self.play(FadeIn(poster))
         self.wait(1)
         self.next_slide()
