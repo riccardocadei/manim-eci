@@ -9,34 +9,31 @@ class S10Conclusion(Slide):
     def construct(self):
         self.camera.background_color = BG
 
-        # ── Title ────────────────────────────────────────────────────────────
-        title = slide_title("Conclusion")
-        self.play(Write(title), run_time=0.8)
-        self.wait(0.5)
-        self.next_slide()
+        # ── Galileo portrait ────────────────────────────────────────────────
+        portrait_path = os.path.join(
+            os.path.dirname(__file__), "..", "assets", "data", "galilei_ritratto.jpg"
+        )
+        portrait = ImageMobject(portrait_path).set_height(3.6)
 
-        # ── Take-away 1 ─────────────────────────────────────────────────────
-        bullet_1 = Text("1.", color=WHITE_TEXT).scale(BODY_SCALE)
-        text_1 = Text(
-            "Dictionary Learning enables Exploratory Causal Inference",
+        # ── Quote ───────────────────────────────────────────────────────────
+        quote = Text(
+            "\u201CMeasure what is measurable, \nand make measurable what is not.\u201D",
             color=WHITE_TEXT,
+            line_spacing=1.0,
         ).scale(BODY_SCALE)
-        row_1 = VGroup(bullet_1, text_1).arrange(RIGHT, buff=0.18)
-        row_1.move_to(UP * 0.6)
 
-        self.play(FadeIn(row_1, shift=RIGHT * 0.15), run_time=0.8)
-        self.wait(0.5)
-        self.next_slide()
+        attribution = Text(
+            "\u2014 Galileo Galilei (1564\u20131642)",
+            color=GRAY_TEXT,
+        ).scale(SMALL_SCALE)
 
-        # ── Take-away 2 ─────────────────────────────────────────────────────
-        bullet_2 = Text("2.", color=WHITE_TEXT).scale(BODY_SCALE)
-        text_2 = Text(
-            "Neural Effect Search (ours) mitigates imperfect representations",
-            color=WHITE_TEXT,
-        ).scale(BODY_SCALE)
-        row_2 = VGroup(bullet_2, text_2).arrange(RIGHT, buff=0.18)
-        row_2.move_to(DOWN * 0.4)
+        text_group = VGroup(quote, attribution).arrange(DOWN, buff=0.4, aligned_edge=LEFT)
 
-        self.play(FadeIn(row_2, shift=RIGHT * 0.15), run_time=0.8)
+        composition = Group(portrait, text_group).arrange(RIGHT, buff=0.7)
+        composition.move_to(ORIGIN)
+
+        self.play(FadeIn(portrait), run_time=0.9)
+        self.play(FadeIn(quote, shift=UP * 0.15), run_time=0.8)
+        self.play(FadeIn(attribution), run_time=0.5)
         self.wait(1)
         self.next_slide()
