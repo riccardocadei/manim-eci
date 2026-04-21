@@ -151,28 +151,32 @@ class S05Pipeline(Slide):
         PRIMARY_W   = 0.13
         SECONDARY_W = 0.055
 
-        def _sankey(y1, y2, w, color, opacity):
-            """Filled S-curve ribbon from (flow_x1, y1) to (flow_x2, y2)."""
+        def _sankey(y1, y2, w, color, opacity, n_seg=64):
+            """Filled S-curve ribbon from (flow_x1, y1) to (flow_x2, y2).
+            Top/bottom edges are sampled as n_seg-segment polylines along a
+            cubic bezier, producing a high-resolution filled ribbon."""
             cx   = (flow_x1 + flow_x2) / 2
             half = w / 2
-            tl = np.array([flow_x1, y1 + half, 0])
-            tr = np.array([flow_x2, y2 + half, 0])
-            br = np.array([flow_x2, y2 - half, 0])
-            bl = np.array([flow_x1, y1 - half, 0])
+
+            def _bez(p0, p1, p2, p3, t):
+                mt = 1 - t
+                return mt**3 * p0 + 3*mt**2*t * p1 + 3*mt*t**2 * p2 + t**3 * p3
+
+            p0t = np.array([flow_x1, y1 + half, 0])
+            p1t = np.array([cx,      y1 + half, 0])
+            p2t = np.array([cx,      y2 + half, 0])
+            p3t = np.array([flow_x2, y2 + half, 0])
+            p0b = np.array([flow_x2, y2 - half, 0])
+            p1b = np.array([cx,      y2 - half, 0])
+            p2b = np.array([cx,      y1 - half, 0])
+            p3b = np.array([flow_x1, y1 - half, 0])
+
+            ts  = np.linspace(0.0, 1.0, n_seg + 1)
+            top = [_bez(p0t, p1t, p2t, p3t, t) for t in ts]
+            bot = [_bez(p0b, p1b, p2b, p3b, t) for t in ts]
+
             band = VMobject(fill_color=color, fill_opacity=opacity, stroke_width=0)
-            band.start_new_path(tl)
-            band.add_cubic_bezier_curve_to(
-                np.array([cx, y1 + half, 0]),
-                np.array([cx, y2 + half, 0]),
-                tr,
-            )
-            band.add_line_to(br)
-            band.add_cubic_bezier_curve_to(
-                np.array([cx, y2 - half, 0]),
-                np.array([cx, y1 - half, 0]),
-                bl,
-            )
-            band.close_path()
+            band.set_points_as_corners([*top, *bot, top[0]])
             return band
 
         primary_flows = VGroup(*[
@@ -188,7 +192,7 @@ class S05Pipeline(Slide):
             _sankey(
                 all_nodes[i].get_center()[1],
                 all_labels[j].get_center()[1],
-                SECONDARY_W, DIM_GRAY, 0.35,
+                SECONDARY_W, WHITE_TEXT, 0.35,
             )
             for i in range(len(all_nodes))
             for j in range(len(all_labels))
