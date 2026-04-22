@@ -12,7 +12,7 @@ CIML_BLUE = "#007BBF"
 def _saence(ref):
     """Fresh SAEnce MarkupText positioned at ref mobject."""
     return MarkupText(
-        f'<span color="{CIML_BLUE}">SAE</span>nce', color=WHITE_TEXT,
+        f'<span color="{WHITE_TEXT}">SAE</span>nce', color=WHITE_TEXT,
     ).scale(0.82).move_to(ref)
 
 
@@ -34,7 +34,7 @@ class S01Title(Slide):
         in_txt   = Text("in", color=WHITE_TEXT).scale(0.82)
         # Start with SAEnce; word_txt is the object we'll keep transforming
         word_txt = MarkupText(
-            f'<span color="{CIML_BLUE}">SAE</span>nce', color=WHITE_TEXT,
+            f'<span color="{WHITE_TEXT}">SAE</span>nce', color=WHITE_TEXT,
         ).scale(0.82)
 
         # Layout: use "Science" as width reference for centering (same char count)

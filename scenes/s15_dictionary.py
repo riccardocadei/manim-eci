@@ -5,18 +5,19 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from config import *
 
 
-class S19RealWorld(Slide):
+class S15Dictionary(Slide):
     def construct(self):
         self.camera.background_color = BG
 
         title = Text(
-            "Results: Humanitarian Program (LEAP1000)",
-            color=WHITE_TEXT,
-            t2s={"Humanitarian Program (LEAP1000)": ITALIC},
+            "Tool: Dictionary Learning", color=WHITE_TEXT,
+            t2s={"Dictionary Learning": ITALIC},
         ).scale(TITLE_SCALE).to_edge(UP, buff=0.4)
-        placeholder = Text("work in progress", color=GRAY_TEXT, slant=ITALIC).scale(BODY_SCALE)
+
+        body = Text("as before", color=GRAY_TEXT).scale(SMALL_SCALE)
+        body.move_to(ORIGIN)
 
         self.play(Write(title), run_time=0.8)
-        self.play(FadeIn(placeholder), run_time=0.5)
+        self.play(FadeIn(body), run_time=0.4)
         self.wait(0.5)
         self.next_slide()

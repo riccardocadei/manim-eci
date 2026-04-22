@@ -72,7 +72,7 @@ def _cross_on(mob, color=RED_LIGHT, size=0.22):
 
 # ── Scene ─────────────────────────────────────────────────────────────────────
 
-class S15NEMS(Slide):
+class S17NEMS(Slide):
     def construct(self):
         self.camera.background_color = BG
 
@@ -108,7 +108,7 @@ class S15NEMS(Slide):
         Z3.move_to([col_Z, -1.55 + vert_off, 0])
         W1.move_to([col_W,  0.95 + vert_off, 0])
         W2.move_to([col_W, -0.55 + vert_off, 0])
-        T.move_to( [col_W, -1.95 + vert_off, 0])
+        T.move_to( [(col_W + col_Y) / 2, -1.55 + vert_off, 0])
         Y.move_to( [col_Y,  0.20 + vert_off, 0])
 
         # Causal arrows: T → Y, W_1 → Y, W_2 → Y
@@ -121,8 +121,11 @@ class S15NEMS(Slide):
         bnd_Z1_W2 = _sankey_band(Z1, W2, BLUE_LIGHT,   width=0.06, opacity=0.18)
         bnd_Z3_W2 = _sankey_band(Z3, W2, PURPLE_LIGHT, width=0.14, opacity=0.40)
         bnd_Z3_W1 = _sankey_band(Z3, W1, PURPLE_LIGHT, width=0.06, opacity=0.18)
+        bnd_Z2_W1 = _sankey_band(Z2, W1, GRAY_TEXT,    width=0.06, opacity=0.18)
+        bnd_Z2_W2 = _sankey_band(Z2, W2, GRAY_TEXT,    width=0.06, opacity=0.18)
 
         bands_Z1 = VGroup(bnd_Z1_W1, bnd_Z1_W2)
+        bands_Z2 = VGroup(bnd_Z2_W1, bnd_Z2_W2)
         bands_Z3 = VGroup(bnd_Z3_W2, bnd_Z3_W1)
 
         # Column labels (at top) + T label (near T)
@@ -169,6 +172,7 @@ class S15NEMS(Slide):
             LaggedStart(
                 FadeIn(bnd_Z1_W1), FadeIn(bnd_Z1_W2),
                 FadeIn(bnd_Z3_W2), FadeIn(bnd_Z3_W1),
+                FadeIn(bnd_Z2_W1), FadeIn(bnd_Z2_W2),
                 lag_ratio=0.08,
             ),
             FadeIn(lbl_Z_grp),
@@ -192,36 +196,38 @@ class S15NEMS(Slide):
             return bar, st, sv
 
         # ==================================================================
-        # STEP 1 — Score each neuron as effect modifier → select max (Z_1)
+        # STEP 1 — Null test for each neuron → select smallest p-value (Z_1)
         # ==================================================================
 
         bar1, _, _ = _bottom_bar(1, r"\mathtt{S} = \varnothing")
 
-        # Score definition (centred, below DAG)
-        score_def1 = MathTex(
-            r"\mathrm{Score}(Z_i)\;=\;\mathrm{Var}_{Z_i}\!\big[\,"
-            r"\mathbb{E}[Y|\mathrm{do}(1),Z_i] - \mathbb{E}[Y|\mathrm{do}(0),Z_i]\,\big]",
+        # Null-hypothesis test (centred, below DAG)
+        null_test = MathTex(
+            r"H_0(j\mid S):\;"
+            r"\mathbb{E}[\tau_i\mid Z_i^{\,j},\mathbf{Z}_i^{\,S}]"
+            r"\;\overset{a.s.}{=}\;"
+            r"\mathbb{E}[\tau_i\mid \mathbf{Z}_i^{\,S}]",
             color=WHITE_TEXT,
-        ).scale(0.48)
-        score_def1.move_to([0, FORM_Y, 0])
+        ).scale(0.50)
+        null_test.move_to([0, FORM_Y, 0])
 
-        # Per-neuron values (next to each Z, on the LEFT)
-        val_z1 = MathTex(r"\mathrm{Score}(Z_1) \approx 0.82", color=WHITE_TEXT).scale(0.34)
-        val_z2 = MathTex(r"\mathrm{Score}(Z_2) \approx 0.11", color=WHITE_TEXT).scale(0.34)
-        val_z3 = MathTex(r"\mathrm{Score}(Z_3) \approx 0.64", color=WHITE_TEXT).scale(0.34)
+        # Per-neuron p-values (next to each Z, on the LEFT)
+        val_z1 = MathTex(r"p\text{-value}(Z_1) \approx 0.001", color=WHITE_TEXT).scale(0.34)
+        val_z2 = MathTex(r"p\text{-value}(Z_2) \approx 0.011", color=WHITE_TEXT).scale(0.34)
+        val_z3 = MathTex(r"p\text{-value}(Z_3) \approx 0.008", color=WHITE_TEXT).scale(0.34)
         val_z1.next_to(Z1, LEFT, buff=0.25)
         val_z2.next_to(Z2, LEFT, buff=0.25)
         val_z3.next_to(Z3, LEFT, buff=0.25)
 
-        # Show bottom bar + score definition
+        # Show bottom bar + null-test definition
         self.play(
             FadeIn(bar1),
-            FadeIn(score_def1, shift=UP * 0.08),
+            FadeIn(null_test, shift=UP * 0.08),
             run_time=0.7,
         )
         self.wait(0.2)
 
-        # Show per-neuron values
+        # Show per-neuron p-values
         self.play(
             LaggedStart(
                 FadeIn(val_z1, shift=RIGHT * 0.08),
@@ -233,7 +239,7 @@ class S15NEMS(Slide):
         )
         self.wait(0.3)
 
-        # Highlight largest → Z_1: scale up then back down
+        # Highlight smallest p-value → Z_1: scale up then back down
         self.play(
             val_z1.animate.scale(1.30).set_color(GREEN_LIGHT),
             Z1[0].animate.set_stroke(GREEN_LIGHT, width=3.5),
@@ -264,23 +270,15 @@ class S15NEMS(Slide):
         bar2, _, _ = _bottom_bar(2, r"\mathtt{S} = \{Z_1\}")
         x_W1 = _cross_on(W1)
 
-        score_def2 = MathTex(
-            r"\mathrm{Score}(Z_i\,|\,Z_1)\;=\;\mathrm{Var}_{Z_i}\!\big[\,"
-            r"\mathbb{E}[Y|\mathrm{do}(1),Z_i,Z_1] - \mathbb{E}[Y|\mathrm{do}(0),Z_i,Z_1]\,\big]",
-            color=WHITE_TEXT,
-        ).scale(0.44)
-        score_def2.move_to([0, FORM_Y, 0])
-
-        val2_z2 = MathTex(r"\mathrm{Score}(Z_2\,|\,Z_1) \approx 0.07", color=WHITE_TEXT).scale(0.32)
-        val2_z3 = MathTex(r"\mathrm{Score}(Z_3\,|\,Z_1) \approx 0.58", color=WHITE_TEXT).scale(0.32)
+        val2_z2 = MathTex(r"p\text{-value}(Z_2\mid Z_1) \approx 0.038", color=WHITE_TEXT).scale(0.32)
+        val2_z3 = MathTex(r"p\text{-value}(Z_3\mid Z_1) \approx 0.012", color=WHITE_TEXT).scale(0.32)
         val2_z2.next_to(Z2, LEFT, buff=0.25)
         val2_z3.next_to(Z3, LEFT, buff=0.25)
 
-        # Transition: clear step-1 values, dim W_1 and its bands, update bar + formula
+        # Transition: clear step-1 values, dim W_1 and its bands, update bar
         self.play(
             FadeOut(step1_vals),
             Transform(bar1, bar2),
-            Transform(score_def1, score_def2),
             W1[0].animate.set_stroke(opacity=0.20),
             W1[1].animate.set_opacity(0.20),
             bnd_Z1_W1.animate.set_fill(opacity=0.08).set_stroke(opacity=0.06),
@@ -289,7 +287,7 @@ class S15NEMS(Slide):
             run_time=0.9,
         )
 
-        # Show new values
+        # Show new p-values
         self.play(
             LaggedStart(
                 FadeIn(val2_z2, shift=RIGHT * 0.08),
@@ -300,7 +298,7 @@ class S15NEMS(Slide):
         )
         self.wait(0.3)
 
-        # Highlight largest → Z_3
+        # Highlight smallest p-value → Z_3
         self.play(
             val2_z3.animate.scale(1.30).set_color(GREEN_LIGHT),
             Z3[0].animate.set_stroke(GREEN_LIGHT, width=3.5),
@@ -331,20 +329,12 @@ class S15NEMS(Slide):
         bar3, _, _ = _bottom_bar(3, r"\mathtt{S} = \{Z_1, Z_3\}")
         x_W2 = _cross_on(W2)
 
-        score_def3 = MathTex(
-            r"\mathrm{Score}(Z_i\,|\,Z_1,Z_3)\;=\;\mathrm{Var}_{Z_i}\!\big[\,"
-            r"\mathbb{E}[Y|\mathrm{do}(1),Z_i,Z_1,Z_3] - \mathbb{E}[Y|\mathrm{do}(0),Z_i,Z_1,Z_3]\,\big]",
-            color=WHITE_TEXT,
-        ).scale(0.40)
-        score_def3.move_to([0, FORM_Y, 0])
-
-        val3_z2 = MathTex(r"\mathrm{Score}(Z_2\,|\,Z_1,Z_3) \approx 0.03", color=WHITE_TEXT).scale(0.30)
+        val3_z2 = MathTex(r"p\text{-value}(Z_2\mid Z_1, Z_3) \approx 0.214", color=WHITE_TEXT).scale(0.30)
         val3_z2.next_to(Z2, LEFT, buff=0.25)
 
         self.play(
             FadeOut(step2_vals),
             Transform(bar1, bar3),
-            Transform(score_def1, score_def3),
             W2[0].animate.set_stroke(opacity=0.20),
             W2[1].animate.set_opacity(0.20),
             bnd_Z3_W2.animate.set_fill(opacity=0.08).set_stroke(opacity=0.06),
@@ -355,7 +345,7 @@ class S15NEMS(Slide):
         self.play(FadeIn(val3_z2, shift=RIGHT * 0.08), run_time=0.5)
         self.wait(0.6)
 
-        # Dim Z_2 formula + node (below-threshold)
+        # p-value > 0.05: cannot reject H_0 → dim Z_2 (no effect modification info)
         self.play(
             val3_z2.animate.set_color(DIM_GRAY),
             Z2[0].animate.set_stroke(DIM_GRAY, width=2.0),

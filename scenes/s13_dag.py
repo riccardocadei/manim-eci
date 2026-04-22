@@ -275,7 +275,8 @@ class S13DAG(Slide):
         self.play(
             eci_title[:11].animate.set_opacity(1),
             eci_subtitle.animate.set_opacity(1),
-            FadeOut(img_pre), FadeOut(rect_x),
+            img_pre.animate.move_to(X_new_pos),
+            rect_x.animate.move_to(X_new_pos),
             ReplacementTransform(X_l, q_X),
             AnimationGroup(GrowFromCenter(X_new_c), FadeIn(X_new_l)),
             Create(arr_QX),

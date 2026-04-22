@@ -26,11 +26,13 @@ SCENES=(
   "scenes/s12_motivation.py       S12Motivation      s12"
   "scenes/s13_dag.py              S13DAG             s13"
   "scenes/s14_objective.py        S14Objective       s14"
-  "scenes/s15_nems.py             S15NEMS            s15"
-  "scenes/s16_experiments.py      S16Experiments     s16"
-  "scenes/s17_real_world.py       S17RealWorld       s17"
-  "scenes/s18_conclusion.py       S18Conclusion      s18"
-  "scenes/s19_thankyou.py         S19ThankYou        s19"
+  "scenes/s15_dictionary.py       S15Dictionary      s15"
+  "scenes/s16_paradox.py          S16Paradox         s16"
+  "scenes/s17_nems.py             S17NEMS            s17"
+  "scenes/s18_experiments.py      S18Experiments     s18"
+  "scenes/s19_real_world.py       S19RealWorld       s19"
+  "scenes/s20_conclusion.py       S20Conclusion      s20"
+  "scenes/s21_thankyou.py         S21ThankYou        s21"
 )
 
 resolve_quality() {
@@ -108,7 +110,7 @@ done
 
 # ── all scenes ───────────────────────────────────────────────────────────────
 if [ -n "$1" ]; then
-  echo "Unknown scene '$1'. Available: s01..s19, clean"
+  echo "Unknown scene '$1'. Available: s01..s21, clean"
   exit 1
 fi
 

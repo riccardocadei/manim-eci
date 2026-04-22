@@ -162,89 +162,65 @@ class S09Experiments(Slide):
         self.wait(0.3)
         self.next_slide()
 
-        # ── Effect 1: bar chart ───────────────────────────────────────────────
+        # ── Effects 1 & 2: bar charts (parallel) ──────────────────────────────
         chart1 = _bar_chart(HAT_DATA)
         chart1.move_to([CHART_X, Y1, 0])
-        lbl1.generate_target()
-        lbl1.target.next_to(chart1, UP, buff=0.20, aligned_edge=LEFT)
-
-        self.play(
-            MoveToTarget(lbl1),
-            LaggedStart(*[FadeIn(r, shift=RIGHT * 0.06) for r in chart1], lag_ratio=0.04),
-            run_time=1.0,
-        )
-        self.wait(0.3)
-        self.next_slide()
-
-        # ── Effect 1: highlight → fly → images ───────────────────────────────
-        hdr1_n, hdr1_d, imgs1, badge1 = _build_panel("N_38", r"Z_{38}", Y1, IMG_X)
-
-        # Step 1: highlight top bar
-        self.play(*_highlight_anim(chart1, idx=0), run_time=0.40)
-
-        # Step 2: ghost of bar label flies to header position while chart slides back
-        #   ghost starts at bar label position (small, white) → transforms to
-        #   hdr1_n position (larger, blue)
-        ghost1 = MathTex(r"Z_{38}", color=WHITE_TEXT).scale(LABEL_SCALE * 0.62)
-        ghost1.move_to(chart1[0][0].get_center())
-        self.add(ghost1)
-        self.play(
-            Transform(ghost1, hdr1_n),           # fly + grow + recolour
-            chart1.animate.shift(LEFT * CHART_SHIFT),
-            lbl1.animate.shift(LEFT * CHART_SHIFT),
-            run_time=0.55,
-        )
-        # Swap ghost (now visually identical to hdr1_n) for the real object
-        self.remove(ghost1)
-        self.add(hdr1_n)
-
-        # Step 3: description text + images slide in
-        self.play(
-            FadeIn(hdr1_d),
-            LaggedStart(*[FadeIn(im, shift=LEFT * 0.20) for im in imgs1], lag_ratio=0.03),
-            run_time=0.75,
-        )
-        self.play(Write(badge1), run_time=0.40)
-        self.wait(0.4)
-        self.next_slide()
-
-        # ── Effect 2: bar chart ───────────────────────────────────────────────
         chart2 = _bar_chart(GLASSES_DATA)
         chart2.move_to([CHART_X, Y2, 0])
+
+        lbl1.generate_target()
+        lbl1.target.next_to(chart1, UP, buff=0.20, aligned_edge=LEFT)
         lbl2.generate_target()
         lbl2.target.next_to(chart2, UP, buff=0.20, aligned_edge=LEFT)
 
         self.play(
+            MoveToTarget(lbl1),
             MoveToTarget(lbl2),
+            LaggedStart(*[FadeIn(r, shift=RIGHT * 0.06) for r in chart1], lag_ratio=0.04),
             LaggedStart(*[FadeIn(r, shift=RIGHT * 0.06) for r in chart2], lag_ratio=0.04),
             run_time=1.0,
         )
         self.wait(0.3)
         self.next_slide()
 
-        # ── Effect 2: highlight → fly → images ───────────────────────────────
+        # ── Effects 1 & 2: highlight → fly → images (parallel) ────────────────
+        hdr1_n, hdr1_d, imgs1, badge1 = _build_panel("N_38",   r"Z_{38}",   Y1, IMG_X)
         hdr2_n, hdr2_d, imgs2, badge2 = _build_panel("N_6051", r"Z_{6051}", Y2, IMG_X)
 
-        self.play(*_highlight_anim(chart2, idx=0), run_time=0.40)
+        # Step 1: highlight top bar of both charts
+        self.play(
+            *_highlight_anim(chart1, idx=0),
+            *_highlight_anim(chart2, idx=0),
+            run_time=0.40,
+        )
 
+        # Step 2: ghost labels fly to header positions while charts slide back
+        ghost1 = MathTex(r"Z_{38}",   color=WHITE_TEXT).scale(LABEL_SCALE * 0.62)
+        ghost1.move_to(chart1[0][0].get_center())
         ghost2 = MathTex(r"Z_{6051}", color=WHITE_TEXT).scale(LABEL_SCALE * 0.62)
         ghost2.move_to(chart2[0][0].get_center())
-        self.add(ghost2)
+        self.add(ghost1, ghost2)
         self.play(
+            Transform(ghost1, hdr1_n),
             Transform(ghost2, hdr2_n),
+            chart1.animate.shift(LEFT * CHART_SHIFT),
             chart2.animate.shift(LEFT * CHART_SHIFT),
+            lbl1.animate.shift(LEFT * CHART_SHIFT),
             lbl2.animate.shift(LEFT * CHART_SHIFT),
             run_time=0.55,
         )
-        self.remove(ghost2)
-        self.add(hdr2_n)
+        self.remove(ghost1, ghost2)
+        self.add(hdr1_n, hdr2_n)
 
+        # Step 3: descriptions + images slide in for both
         self.play(
+            FadeIn(hdr1_d),
             FadeIn(hdr2_d),
+            LaggedStart(*[FadeIn(im, shift=LEFT * 0.20) for im in imgs1], lag_ratio=0.03),
             LaggedStart(*[FadeIn(im, shift=LEFT * 0.20) for im in imgs2], lag_ratio=0.03),
             run_time=0.75,
         )
-        self.play(Write(badge2), run_time=0.40)
+        self.play(Write(badge1), Write(badge2), run_time=0.40)
         self.wait(0.4)
         self.next_slide()
 

@@ -27,9 +27,9 @@ class S14Objective(Slide):
             8: np.array([0.0, y_mid - dy, 0]),
         }
 
-        r = 0.6
-        fs_single = 0.72
-        fs_sub    = 0.58
+        r = 0.48
+        fs_single = 0.62
+        fs_sub    = 0.50
 
         def node(label_tex, p, fs):
             c = Circle(radius=r, color=WHITE_TEXT, stroke_width=3.5).move_to(p)
@@ -60,46 +60,44 @@ class S14Objective(Slide):
         arr_WdirWprox = arr(Wdir_c, Wprox_c)
 
         # ── Reveal ───────────────────────────────────────────────────────────
+        # T, Y and T→Y carry over from s13 end state — no re-reveal
+        self.add(T_c, T_l, Y_c, Y_l, arr_TY)
+
         self.play(Write(title), run_time=0.7)
         self.play(
             LaggedStart(
                 *[AnimationGroup(GrowFromCenter(c), FadeIn(l))
-                  for c, l in [(T_c, T_l), (Y_c, Y_l),
-                               (Wind_c, Wind_l), (Wdir_c, Wdir_l),
+                  for c, l in [(Wind_c, Wind_l), (Wdir_c, Wdir_l),
                                (Wprox_c, Wprox_l), (Wcc_c, Wcc_l)]],
                 lag_ratio=0.12,
             ),
-            run_time=1.6,
+            run_time=1.4,
         )
         self.play(
             LaggedStart(
-                Create(arr_TY),
                 Create(arr_WindWdir),
                 Create(arr_WdirWprox),
                 Create(arr_WdirY),
                 Create(arr_WindWcc),
                 lag_ratio=0.15,
             ),
-            run_time=1.2,
+            run_time=1.0,
         )
         self.wait(0.4)
         self.next_slide()
 
-        # ── Emphasize W_dir (bold + larger), dim other W nodes ──────────────
+        # ── De-emphasize non-W_dir relations (dim arrows and non-W_dir W nodes) ──
         dim = 0.18
-        scale_up = 1.28
         self.play(
-            Wdir_c.animate.scale(scale_up).set_stroke(width=6.0),
-            Wdir_l.animate.scale(scale_up).set_stroke(width=1.2, opacity=1.0),
+            arr_WindWdir.animate.set_opacity(dim),
+            arr_WindWcc.animate.set_opacity(dim),
+            arr_WdirWprox.animate.set_opacity(dim),
             Wind_c.animate.set_opacity(dim),
             Wind_l.animate.set_opacity(dim),
             Wprox_c.animate.set_opacity(dim),
             Wprox_l.animate.set_opacity(dim),
             Wcc_c.animate.set_opacity(dim),
             Wcc_l.animate.set_opacity(dim),
-            arr_WindWdir.animate.set_opacity(dim),
-            arr_WindWcc.animate.set_opacity(dim),
-            arr_WdirWprox.animate.set_opacity(dim),
             run_time=0.9,
         )
         self.wait(0.4)

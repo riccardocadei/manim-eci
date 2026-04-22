@@ -269,11 +269,11 @@ class S08NES(Slide):
 
         # Per-neuron formulas conditioned on Z₁
         form2_z2 = MathTex(
-            r"\mathbb{E}[Z_2 | \mathrm{do}(1), Z_1] - \mathbb{E}[Z_2 | \mathrm{do}(0), Z_1]",
+            r"\mathbb{E}\!\left[\mathbb{E}[Z_2 | \mathrm{do}(1), Z_1] - \mathbb{E}[Z_2 | \mathrm{do}(0), Z_1]\right]",
             color=WHITE_TEXT,
         ).scale(0.28)
         form2_z3 = MathTex(
-            r"\mathbb{E}[Z_3 | \mathrm{do}(1), Z_1] - \mathbb{E}[Z_3 | \mathrm{do}(0), Z_1]",
+            r"\mathbb{E}\!\left[\mathbb{E}[Z_3 | \mathrm{do}(1), Z_1] - \mathbb{E}[Z_3 | \mathrm{do}(0), Z_1]\right]",
             color=WHITE_TEXT,
         ).scale(0.28)
         form2_z2.next_to(Z2, RIGHT, buff=0.40)
@@ -348,7 +348,7 @@ class S08NES(Slide):
         x_Y2 = _cross_on(Y2)
 
         form3_z2 = MathTex(
-            r"\mathbb{E}[Z_2 | \mathrm{do}(1), Z_1, Z_3] - \mathbb{E}[Z_2 | \mathrm{do}(0), Z_1, Z_3]",
+            r"\mathbb{E}\!\left[\mathbb{E}[Z_2 | \mathrm{do}(1), Z_1, Z_3] - \mathbb{E}[Z_2 | \mathrm{do}(0), Z_1, Z_3]\right]",
             color=WHITE_TEXT,
         ).scale(0.26)
         form3_z2.next_to(Z2, RIGHT, buff=0.40)
