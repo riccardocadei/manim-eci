@@ -92,12 +92,12 @@ class S14Objective(Slide):
             arr_WindWdir.animate.set_opacity(dim),
             arr_WindWcc.animate.set_opacity(dim),
             arr_WdirWprox.animate.set_opacity(dim),
-            Wind_c.animate.set_opacity(dim),
-            Wind_l.animate.set_opacity(dim),
-            Wprox_c.animate.set_opacity(dim),
-            Wprox_l.animate.set_opacity(dim),
-            Wcc_c.animate.set_opacity(dim),
-            Wcc_l.animate.set_opacity(dim),
+            Wind_c.animate.set_stroke(color=GRAY_TEXT).set_opacity(dim),
+            Wind_l.animate.set_color(GRAY_TEXT).set_opacity(dim),
+            Wprox_c.animate.set_stroke(color=GRAY_TEXT).set_opacity(dim),
+            Wprox_l.animate.set_color(GRAY_TEXT).set_opacity(dim),
+            Wcc_c.animate.set_stroke(color=GRAY_TEXT).set_opacity(dim),
+            Wcc_l.animate.set_color(GRAY_TEXT).set_opacity(dim),
             run_time=0.9,
         )
         self.wait(0.4)

@@ -488,19 +488,23 @@ class S05Dictionary(Slide):
             return anims
 
         seg = 5.0
-        # Initialize sparse to PATTERNS[0] so the upcoming loop starts and ends
-        # at the same state (seamless loop).
-        self.play(
-            *all_anims(PATTERNS[0]),
-            tracker.animate.set_value(tracker.get_value() + seg),
-            run_time=seg, rate_func=linear,
-        )
+        # Iterate through all 6 patterns (~30s) so the full animation plays in
+        # this slide before any loop; ends at PATTERNS[0] for a seamless loop.
+        T_init = tracker.get_value()
+        INIT_FULL = [PATTERNS[0], PATTERNS[1], PATTERNS[2],
+                     PATTERNS[3], PATTERNS[4], PATTERNS[5]]
+        for i, pat in enumerate(INIT_FULL):
+            self.play(
+                *all_anims(pat),
+                tracker.animate.set_value(T_init + (i + 1) * seg),
+                run_time=seg, rate_func=linear,
+            )
 
-        # Loop: full animation; returns to PATTERNS[0] for seamless loop
+        # Idle loop: keep iterating; returns to PATTERNS[5] for seamless loop
         self.next_slide(loop=True)
         T0 = tracker.get_value()
-        LOOP_FULL = [PATTERNS[1], PATTERNS[2], PATTERNS[3],
-                     PATTERNS[4], PATTERNS[5], PATTERNS[0]]
+        LOOP_FULL = [PATTERNS[0], PATTERNS[1], PATTERNS[2],
+                     PATTERNS[3], PATTERNS[4], PATTERNS[5]]
         for i, pat in enumerate(LOOP_FULL):
             self.play(
                 *all_anims(pat),

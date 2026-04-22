@@ -157,12 +157,9 @@ class S12Motivation(Slide):
         )
         prompt_mob = Text(
             PROMPT, color=_CTXT,
-            font="Helvetica Neue", font_size=26,
+            font="Helvetica Neue", font_size=18,
             line_spacing=1.20,
         )
-        _max_w = 0.909 * _BXW
-        if prompt_mob.width > _max_w:
-            prompt_mob.set_width(_max_w)
         prompt_mob.align_to([_BXL + 0.031 * _BXW, 0, 0], LEFT)
         prompt_mob.align_to([0, _BXT - 0.153 * _BXH, 0], UP)
 
