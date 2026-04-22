@@ -157,7 +157,7 @@ class S12Motivation(Slide):
         )
         prompt_mob = Text(
             PROMPT, color=_CTXT,
-            font="Helvetica Neue", font_size=30,
+            font="Helvetica Neue", font_size=26,
             line_spacing=1.20,
         )
         _max_w = 0.909 * _BXW

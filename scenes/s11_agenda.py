@@ -40,7 +40,7 @@ class S11Agenda(Slide):
         item2_head = VGroup(item2_num, item2_main).arrange(RIGHT, buff=0.28)
         item2_sub = MarkupText(
             'Neural Effect Modifiers Search — Cadei, Bargagli-Stoffi, Locatello '
-            '\n Ongoing (workshop AISTATS’26)',
+            '\nOngoing (workshop AISTATS’26)',
             color=GRAY_TEXT, slant=ITALIC,
         ).scale(0.32)
         item2_sub.next_to(item2_main, DOWN, buff=0.18, aligned_edge=LEFT)

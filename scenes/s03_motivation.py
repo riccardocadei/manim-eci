@@ -195,16 +195,17 @@ class S03Motivation(Slide):
         chat_toolbar = VGroup(chat_sep, chat_plus, et_pill, mic_icon, snd_btn)
 
         PROMPT = (
-            "What is the social effect of a pathogen exposure? "
-            "I have some hypotheses but unsure if exhaustive.\n"
-            "See experiment in attachment."
+            "What is the social effect of a pathogen exposure?\n"
+            "I have some hypotheses but unsure if exhaustive. See experiment in attachment."
         )
         prompt_mob = Text(
             PROMPT, color=_CTXT,
-            font="Helvetica Neue", font_size=30,
+            font="Helvetica Neue", font_size=26,
             line_spacing=1.20,
         )
-        prompt_mob.set_width(0.909 * _BXW)
+        _max_w = 0.909 * _BXW
+        if prompt_mob.width > _max_w:
+            prompt_mob.set_width(_max_w)
         prompt_mob.align_to([_BXL + 0.031 * _BXW, 0, 0], LEFT)
         prompt_mob.align_to([0, _BXT - 0.153 * _BXH, 0], UP)
 
