@@ -345,13 +345,12 @@ class S05Pipeline(Slide):
             return VGroup(box, content)
 
         a1 = make_assumption(
-            "Assumption 1:",
-            r"effects entangled in the post-treatment",
-            r"observation, e.g., visible behaviour",
+            "A1: Sufficiency",
+            r"$H(Y|X)=H(Y|Z)\approx 0$",
         )
         a2 = make_assumption(
-            "Assumption 2:",
-            r"effect concepts $\sim$retrieved by dictionary learning",
+            "A2: Principal Alignment",
+            r"1 Neuron $\approx$ 1 Concept",
         )
 
         assumptions = VGroup(a1, a2).arrange(DOWN, buff=0.40)
