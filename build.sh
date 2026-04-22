@@ -13,16 +13,24 @@ OUT_DIR="output"
 
 SCENES=(
   "scenes/s01_title.py            S01Title           s01"
-  "scenes/s02_motivation.py       S02Motivation      s02"
-  "scenes/s03_eci.py              S03ECI             s03"
-  "scenes/s04_dictionary.py       S04Dictionary      s04"
-  "scenes/s05_pipeline.py         S05Pipeline        s05"
-  "scenes/s06_paradox.py          S06Paradox         s06"
-  "scenes/s07_nes.py              S07NES             s07"
-  "scenes/s08_experiments.py      S08Experiments     s08"
-  "scenes/s09_realworld.py        S09RealWorld       s09"
-  "scenes/s10_conclusion.py       S10Conclusion      s10"
-  "scenes/s11_thankyou.py         S11ThankYou        s11"
+  "scenes/s02_agenda.py           S02Agenda          s02"
+  "scenes/s03_motivation.py       S03Motivation      s03"
+  "scenes/s04_eci.py              S04ECI             s04"
+  "scenes/s05_dictionary.py       S05Dictionary      s05"
+  "scenes/s06_pipeline.py         S06Pipeline        s06"
+  "scenes/s07_paradox.py          S07Paradox         s07"
+  "scenes/s08_nes.py              S08NES             s08"
+  "scenes/s09_experiments.py      S09Experiments     s09"
+  "scenes/s10_realworld.py        S10RealWorld       s10"
+  "scenes/s11_agenda.py           S11Agenda          s11"
+  "scenes/s12_motivation.py       S12Motivation      s12"
+  "scenes/s13_dag.py              S13DAG             s13"
+  "scenes/s14_objective.py        S14Objective       s14"
+  "scenes/s15_nems.py             S15NEMS            s15"
+  "scenes/s16_experiments.py      S16Experiments     s16"
+  "scenes/s17_real_world.py       S17RealWorld       s17"
+  "scenes/s18_conclusion.py       S18Conclusion      s18"
+  "scenes/s19_thankyou.py         S19ThankYou        s19"
 )
 
 resolve_quality() {
@@ -100,7 +108,7 @@ done
 
 # ── all scenes ───────────────────────────────────────────────────────────────
 if [ -n "$1" ]; then
-  echo "Unknown scene '$1'. Available: s01..s12, clean"
+  echo "Unknown scene '$1'. Available: s01..s19, clean"
   exit 1
 fi
 

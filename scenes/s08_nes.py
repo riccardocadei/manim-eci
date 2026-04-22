@@ -72,7 +72,7 @@ def _cross_on(mob, color=RED_LIGHT, size=0.22):
 
 # ── Scene ─────────────────────────────────────────────────────────────────────
 
-class S07NES(Slide):
+class S08NES(Slide):
     def construct(self):
         self.camera.background_color = BG
 

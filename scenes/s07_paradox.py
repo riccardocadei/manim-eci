@@ -6,7 +6,7 @@ from config import *
 import numpy as np
 
 
-class S06Paradox(Slide):
+class S07Paradox(Slide):
     def construct(self):
         self.camera.background_color = BG
 
@@ -17,7 +17,7 @@ class S06Paradox(Slide):
         self.next_slide()
 
         # ══════════════════════════════════════════════════════════════════════
-        # Reproduce the DAG + Sankey flow from s05
+        # Reproduce the DAG + Sankey flow from s06
         # ══════════════════════════════════════════════════════════════════════
         r_node = 0.44
         n_dag  = 5
@@ -165,7 +165,7 @@ class S06Paradox(Slide):
             z_m_circ.get_left() + LEFT * 0.05,
         )
 
-        # ── Show entire DAG at once (recap from s05) ─────────────────────────
+        # ── Show entire DAG at once (recap from s06) ─────────────────────────
         dag_group = VGroup(
             T_circ, T_lbl,
             n_circs, z_labels, primary_flows, secondary_flows, interp_labels,

@@ -127,7 +127,7 @@ def _neuron_row(neuron_id, quiet_folder, top_folder, interp_lines, y_center):
     return labels, grids, anim_quiet + anim_top
 
 
-class S09RealWorld(Slide):
+class S10RealWorld(Slide):
     def construct(self):
         self.camera.background_color = BG
 

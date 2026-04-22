@@ -5,39 +5,14 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from config import *
 
 LOGO_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "data", "logo")
-LOGO_H   = 0.65
-ICLR_H   = 0.82
-
-
-def _whiten(img_mob):
-    arr = img_mob.pixel_array.copy()
-    mask = arr[:, :, 3] > 10
-    arr[mask, 0:3] = [242, 242, 242]
-    img_mob.pixel_array = arr
-    return img_mob
-
-
-def _apex(text):
-    return Text(text, color=PURPLE_LIGHT).scale(0.21)
-
-
-def _author(name, apex, bold=False):
-    t = Text(name, color=WHITE_TEXT, weight=BOLD if bold else NORMAL).scale(0.38)
-    a = _apex(apex)
-    a.next_to(t, UR, buff=0.02).shift(DOWN * 0.04)
-    return VGroup(t, a)
-
-
-def _labeled_logo(logo_mob, apex_str):
-    a = _apex(apex_str)
-    a.next_to(logo_mob, UP, buff=0.05).align_to(logo_mob, LEFT)
-    return Group(logo_mob, a)
+LOGO_H   = 1.05
+CIML_BLUE = "#007BBF"
 
 
 def _saence(ref):
     """Fresh SAEnce MarkupText positioned at ref mobject."""
     return MarkupText(
-        '<span color="#C39BD3">SAE</span>nce', color=WHITE_TEXT,
+        f'<span color="{CIML_BLUE}">SAE</span>nce', color=WHITE_TEXT,
     ).scale(0.82).move_to(ref)
 
 
@@ -59,7 +34,7 @@ class S01Title(Slide):
         in_txt   = Text("in", color=WHITE_TEXT).scale(0.82)
         # Start with SAEnce; word_txt is the object we'll keep transforming
         word_txt = MarkupText(
-            '<span color="#C39BD3">SAE</span>nce', color=WHITE_TEXT,
+            f'<span color="{CIML_BLUE}">SAE</span>nce', color=WHITE_TEXT,
         ).scale(0.82)
 
         # Layout: use "Science" as width reference for centering (same char count)
@@ -69,32 +44,30 @@ class S01Title(Slide):
         in_txt.move_to(_dummy[0])
         word_txt.move_to(_dummy[1])
 
-        # ── Authors ──────────────────────────────────────────────────────────
-        tom      = _author("Tommaso Mencattini", "*,1,2")
-        riccardo = _author("Riccardo Cadei",     "*,1",  bold=True)
-        francesco= _author("Francesco Locatello","1")
+        # ── Presenter info ───────────────────────────────────────────────────
+        name = Text("Riccardo Cadei", color=WHITE_TEXT, weight=BOLD).scale(0.42)
+        aff_lines = VGroup(*[
+            Text(t, color="#AAAAAA").scale(0.26)
+            for t in (
+                "PhD Student",
+                "Causal Learning and Artificial Intelligence Group",
+                "Institute of Science and Technology, Austria (ISTA)",
+            )
+        ]).arrange(DOWN, buff=0.08)
+        presenter = VGroup(name, aff_lines).arrange(DOWN, buff=0.22)
+        presenter.next_to(_dummy, DOWN, buff=0.60)
 
-        authors = VGroup(tom, riccardo, francesco).arrange(RIGHT, buff=0.55)
-        footnote = Text("* equal contribution", color="#888888").scale(0.26)
-        author_block = VGroup(authors, footnote).arrange(DOWN, buff=0.22)
-        author_block.next_to(_dummy, DOWN, buff=0.50)
+        # ── CIML 2026 badge (top right) ──────────────────────────────────────
+        ciml_badge = Text(
+            "CIML 2026", color=CIML_BLUE, font="Helvetica Neue", weight=BOLD,
+        ).scale(0.48)
+        ciml_badge.to_corner(UR, buff=0.45)
 
-        # ── Logos ────────────────────────────────────────────────────────────
+        # ── Logo ─────────────────────────────────────────────────────────────
         logo_ista = SVGMobject(os.path.join(LOGO_DIR, "ISTA.svg"))
-        logo_epfl = _whiten(ImageMobject(os.path.join(LOGO_DIR, "EPFL.png")))
-        logo_iclr = _whiten(ImageMobject(os.path.join(LOGO_DIR, "ICLR.png")))
-
         logo_ista.set_color(WHITE_TEXT)
         logo_ista.scale_to_fit_height(LOGO_H)
-        logo_epfl.scale_to_fit_height(LOGO_H)
-        logo_iclr.scale_to_fit_height(ICLR_H)
-
-        uni_logos = Group(
-            _labeled_logo(logo_ista, "1"),
-            _labeled_logo(logo_epfl, "2"),
-        ).arrange(RIGHT, buff=0.70)
-        uni_logos.to_edge(DOWN, buff=0.40)
-        logo_iclr.to_corner(UR, buff=0.35)
+        logo_ista.to_edge(DOWN, buff=0.50)
 
         # ── Slide 1: appear with SAEnce ──────────────────────────────────────
         self.play(Write(line1), run_time=1.0)
@@ -103,10 +76,10 @@ class S01Title(Slide):
             FadeIn(word_txt, shift=UP * 0.1),
             run_time=0.6,
         )
-        self.play(FadeIn(author_block, shift=UP * 0.1), run_time=0.8)
+        self.play(FadeIn(presenter, shift=UP * 0.1), run_time=0.8)
         self.play(
-            FadeIn(uni_logos, shift=UP * 0.1),
-            FadeIn(logo_iclr),
+            FadeIn(logo_ista, shift=UP * 0.1),
+            FadeIn(ciml_badge),
             run_time=0.6,
         )
         self.wait(1)

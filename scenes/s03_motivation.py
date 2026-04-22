@@ -54,7 +54,7 @@ class VideoPlayer(ImageMobject):
 
 # ── Scene ──────────────────────────────────────────────────────────────────────
 
-class S02Motivation(Slide):
+class S03Motivation(Slide):
     def construct(self):
         self.camera.background_color = BG
 

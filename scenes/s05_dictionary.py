@@ -90,7 +90,7 @@ def multicolor_neuron(colors, radius=0.13, sector_opacities=None):
 
 # ── Scene ──────────────────────────────────────────────────────────────────────
 
-class S04Dictionary(Slide):
+class S05Dictionary(Slide):
     def construct(self):
         self.camera.background_color = BG
 

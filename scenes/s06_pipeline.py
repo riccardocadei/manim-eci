@@ -28,12 +28,12 @@ class VideoPlayer(ImageMobject):
         return self
 
 
-class S05Pipeline(Slide):
+class S06Pipeline(Slide):
     def construct(self):
         self.camera.background_color = BG
 
         # ── Title ─────────────────────────────────────────────────────────────
-        title = slide_title("Exploratory Causal Inference")
+        title = slide_title("Treatment Effect Identification")
         self.play(Write(title), run_time=0.8)
         self.wait(0.5)
         self.next_slide()

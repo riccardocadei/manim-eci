@@ -50,7 +50,7 @@ class VideoPlayer(ImageMobject):
 
 # ── Scene ──────────────────────────────────────────────────────────────────────
 
-class S03ECI(Slide):
+class S04ECI(Slide):
     def construct(self):
         self.camera.background_color = BG
 
@@ -88,6 +88,12 @@ class S03ECI(Slide):
         ).scale(TITLE_SCALE).to_edge(UP, buff=0.4)
         eci_title[:11].set_opacity(0.25)
 
+        eci_subtitle = Text(
+            "Treatment Effect Identification",
+            color=GRAY_TEXT,
+        ).scale(BODY_SCALE * 0.9).next_to(eci_title, DOWN, buff=0.2)
+        eci_subtitle.set_opacity(0)
+
         # Ghost GIF underlays
         _ghost_op = 0.18
         _ov_op    = 1 - _ghost_op
@@ -102,7 +108,7 @@ class S03ECI(Slide):
                            fill_color=BG, fill_opacity=_ov_op, stroke_width=0).move_to(Y_c)
 
         self.add(ov_t, ov_d, rect_t, rect_d)
-        self.add(T_c, T_l, Y_c, Y_l, arr_TY, q_TY, eci_title)
+        self.add(T_c, T_l, Y_c, Y_l, arr_TY, q_TY, eci_title, eci_subtitle)
 
         # ── Slide: reveal "Exploratory", Y → "?", add X with effect GIF ─────
 
@@ -136,9 +142,10 @@ class S03ECI(Slide):
         ov_d.add_updater(lambda m: m.set_time(ov_tracker.get_value()))
         ov_e.add_updater(lambda m: m.set_time(ov_tracker.get_value()))
 
-        # Step 1: reveal "Exploratory" to full white
+        # Step 1: reveal "Exploratory" to full white + fade in subtitle
         self.play(
             eci_title[:11].animate.set_opacity(1),
+            eci_subtitle.animate.set_opacity(1),
             run_time=0.6,
         )
         self.wait(0.3)
