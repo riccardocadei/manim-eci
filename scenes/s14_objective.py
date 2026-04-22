@@ -31,33 +31,42 @@ class S14Objective(Slide):
         fs_single = 0.62
         fs_sub    = 0.50
 
-        def node(label_tex, p, fs):
-            c = Circle(radius=r, color=WHITE_TEXT, stroke_width=3.5).move_to(p)
-            l = MathTex(label_tex, color=WHITE_TEXT).scale(fs).move_to(c)
+        c_wind = BLUE_LIGHT
+        c_wprox = GREEN_LIGHT
+        c_wcc = YELLOW_LIGHT
+
+        def node(label_tex, p, fs, color=WHITE_TEXT):
+            c = Circle(
+                radius=r,
+                color=color,
+                stroke_width=3.5,
+                fill_opacity=0,
+            ).move_to(p)
+            l = MathTex(label_tex, color=color).scale(fs).move_to(c)
             return c, l
 
-        T_c,     T_l     = node(r"T",                pos[2], fs_single)
-        Y_c,     Y_l     = node(r"Y",                pos[3], fs_single)
-        Wind_c,  Wind_l  = node(r"W_{\mathrm{ind}}", pos[4], fs_sub)
-        Wdir_c,  Wdir_l  = node(r"W_{\mathrm{dir}}", pos[5], fs_sub)
-        Wprox_c, Wprox_l = node(r"W_{\mathrm{prox}}",pos[6], fs_sub)
-        Wcc_c,   Wcc_l   = node(r"W_{\mathrm{cc}}",  pos[8], fs_sub)
+        T_c,     T_l     = node(r"T",                 pos[2], fs_single)
+        Y_c,     Y_l     = node(r"Y",                 pos[3], fs_single)
+        Wind_c,  Wind_l  = node(r"W_{\mathrm{ind}}",  pos[4], fs_sub, c_wind)
+        Wdir_c,  Wdir_l  = node(r"W_{\mathrm{dir}}",  pos[5], fs_sub)
+        Wprox_c, Wprox_l = node(r"W_{\mathrm{prox}}", pos[6], fs_sub, c_wprox)
+        Wcc_c,   Wcc_l   = node(r"W_{\mathrm{cc}}",   pos[8], fs_sub, c_wcc)
 
-        def arr(a_c, b_c):
+        def arr(a_c, b_c, color=WHITE_TEXT):
             a_p, b_p = a_c.get_center(), b_c.get_center()
             d = (b_p - a_p) / np.linalg.norm(b_p - a_p)
             return Arrow(
                 a_p + d * (r + 0.08),
                 b_p - d * (r + 0.08),
-                color=WHITE_TEXT, buff=0, stroke_width=5,
+                color=color, buff=0, stroke_width=5,
                 max_tip_length_to_length_ratio=0.18,
             )
 
         arr_TY        = arr(T_c,    Y_c)
         arr_WdirY     = arr(Wdir_c, Y_c)
-        arr_WindWdir  = arr(Wind_c, Wdir_c)
-        arr_WindWcc   = arr(Wind_c, Wcc_c)
-        arr_WdirWprox = arr(Wdir_c, Wprox_c)
+        arr_WindWdir  = arr(Wind_c, Wdir_c, c_wind)
+        arr_WindWcc   = arr(Wind_c, Wcc_c, c_wcc)
+        arr_WdirWprox = arr(Wdir_c, Wprox_c, c_wprox)
 
         # ── Reveal ───────────────────────────────────────────────────────────
         # T, Y and T→Y carry over from s13 end state — no re-reveal
@@ -86,18 +95,18 @@ class S14Objective(Slide):
         self.wait(0.4)
         self.next_slide()
 
-        # ── De-emphasize non-W_dir relations (dim arrows and non-W_dir W nodes) ──
+        # ── De-emphasize non-W_dir relations (dim arrows + matching non-W_dir W nodes) ──
         dim = 0.18
         self.play(
             arr_WindWdir.animate.set_opacity(dim),
             arr_WindWcc.animate.set_opacity(dim),
             arr_WdirWprox.animate.set_opacity(dim),
-            Wind_c.animate.set_stroke(color=GRAY_TEXT).set_opacity(dim),
-            Wind_l.animate.set_color(GRAY_TEXT).set_opacity(dim),
-            Wprox_c.animate.set_stroke(color=GRAY_TEXT).set_opacity(dim),
-            Wprox_l.animate.set_color(GRAY_TEXT).set_opacity(dim),
-            Wcc_c.animate.set_stroke(color=GRAY_TEXT).set_opacity(dim),
-            Wcc_l.animate.set_color(GRAY_TEXT).set_opacity(dim),
+            Wind_c.animate.set_stroke(opacity=dim),
+            Wind_l.animate.set_opacity(dim),
+            Wprox_c.animate.set_stroke(opacity=dim),
+            Wprox_l.animate.set_opacity(dim),
+            Wcc_c.animate.set_stroke(opacity=dim),
+            Wcc_l.animate.set_opacity(dim),
             run_time=0.9,
         )
         self.wait(0.4)
