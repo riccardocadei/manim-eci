@@ -195,9 +195,8 @@ class S02Motivation(Slide):
         chat_toolbar = VGroup(chat_sep, chat_plus, et_pill, mic_icon, snd_btn)
 
         PROMPT = (
-            "What is the social effect of a pathogen exposure? "
-            "I have some hypotheses but unsure if exhaustive.\n"
-            "See experiment in attachment."
+            "What is the social effect of a pathogen exposure? I have some hypotheses but\n"
+            "unsure if exhaustive. See experiment in attachment."
         )
         prompt_mob = Text(
             PROMPT, color=_CTXT,

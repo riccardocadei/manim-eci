@@ -330,26 +330,31 @@ class S05Pipeline(Slide):
         BOX_PAD   = 0.28
         BOX_COLOR = WHITE_TEXT
 
-        def make_assumption(label, *body_lines):
-            lbl_tex   = Tex(rf"\textbf{{{label}}}", color=WHITE_TEXT).scale(0.44)
+        def make_assumption(label_prefix, label_name, *body_lines):
+            lbl_tex   = Tex(
+                rf"\textbf{{{label_prefix}:}} \textit{{{label_name}}}",
+                color=WHITE_TEXT,
+            ).scale(0.44)
             body_texs = [Tex(line, color=GRAY_TEXT).scale(0.40) for line in body_lines]
-            content   = VGroup(lbl_tex, *body_texs).arrange(DOWN, buff=0.08, aligned_edge=LEFT)
+            content   = VGroup(lbl_tex, *body_texs).arrange(DOWN, buff=0.08)
             box = Rectangle(
                 width=BOX_W,
                 height=content.get_height() + 2 * BOX_PAD,
                 color=BOX_COLOR, stroke_width=1.4, fill_opacity=0,
             )
-            # Centre vertically, then pin left edge to box left + padding
             content.move_to(box)
-            content.shift(LEFT * (content.get_left()[0] - (box.get_left()[0] + BOX_PAD)))
+            # Pin label to left edge; keep body lines centred
+            lbl_tex.shift(LEFT * (lbl_tex.get_left()[0] - (box.get_left()[0] + BOX_PAD)))
+            for body in body_texs:
+                body.move_to([box.get_center()[0], body.get_center()[1], 0])
             return VGroup(box, content)
 
         a1 = make_assumption(
-            "A1: Sufficiency",
+            "Assumption 1", "Sufficiency",
             r"$H(Y|X)=H(Y|Z)\approx 0$",
         )
         a2 = make_assumption(
-            "A2: Principal Alignment",
+            "Assumption 2", "Principal Alignment",
             r"1 Neuron $\approx$ 1 Concept",
         )
 

@@ -316,11 +316,34 @@ class S04Dictionary(Slide):
                     )
             return anims
 
+        def ent_sparse_anims(pattern):
+            """Animate entangled sectors + sparse circles (no sankey/labels yet)."""
+            anims = []
+            for c_idx, val in enumerate(pattern):
+                col = CONCEPT_COLORS[c_idx]
+                for j in range(N_ENT):
+                    sec = ENT_SECTOR_FOR_CONCEPT[j][c_idx]
+                    anims.append(
+                        ent_neurons[j][0][sec].animate.set_fill(
+                            opacity=0.90 if val > 0.3 else 0.12
+                        )
+                    )
+                if val > 0.3:
+                    anims.append(
+                        n_circles[c_idx].animate
+                            .set_fill(col, opacity=val).set_stroke(col, width=2.0)
+                    )
+                else:
+                    anims.append(
+                        n_circles[c_idx].animate
+                            .set_fill(DIM_GRAY, opacity=0.2).set_stroke(DIM_GRAY, width=1.5)
+                    )
+            return anims
+
         # ── Animations ────────────────────────────────────────────────────────
         self.play(Write(title), run_time=0.8)
-        self.play(FadeIn(per_obs, shift=DOWN * 0.06), run_time=0.4)
-        self.play(tracker.animate.set_value(tracker.get_value() + 1.1), run_time=1.1, rate_func=linear)
         self.next_slide()
+        self.play(FadeIn(per_obs, shift=DOWN * 0.06), run_time=0.4)
 
         self.play(
             FadeIn(vid), FadeIn(vid_lbl),
@@ -328,6 +351,8 @@ class S04Dictionary(Slide):
             run_time=0.5, rate_func=linear,
         )
         self.play(tracker.animate.set_value(tracker.get_value() + 3.0), run_time=3.0, rate_func=linear)
+        self.play(tracker.animate.set_value(tracker.get_value() + 4.0), run_time=4.0, rate_func=linear)
+        self.next_slide()
 
         self.play(
             FadeIn(vit_shape), FadeIn(vit_lbl), Create(arr_vid2vit),
@@ -351,7 +376,19 @@ class S04Dictionary(Slide):
                 run_time=1.0, rate_func=linear,
             )
 
-        # SAE + sparse appear gradually; entangled neurons keep cycling
+        # Entangled keeps cycling through remaining patterns
+        T_ent_loop = tracker.get_value()
+        LOOP_ENT = [PATTERNS[3], PATTERNS[4], PATTERNS[5],
+                    PATTERNS[0], PATTERNS[1], PATTERNS[2]]
+        for i, pat in enumerate(LOOP_ENT):
+            self.play(
+                *ent_only_anims(pat),
+                tracker.animate.set_value(T_ent_loop + (i + 1) * 1.0),
+                run_time=1.0, rate_func=linear,
+            )
+        self.next_slide()
+
+        # SAE box appears; entangled neurons keep cycling
         ent_pat_idx = 3  # continue from pattern 3 (first 3 used above)
         self.play(
             FadeIn(sae_shape), FadeIn(sae_lbl), Create(arr_ent2sae),
@@ -360,24 +397,50 @@ class S04Dictionary(Slide):
             run_time=0.7, rate_func=linear,
         )
         ent_pat_idx += 1
+
+        # Pre-activate sparse circles so they grow in already animating
+        pat_sparse_start = PATTERNS[ent_pat_idx % len(PATTERNS)]
+        for i in range(N):
+            val = pat_sparse_start[i]
+            if val > 0.3:
+                col = CONCEPT_COLORS[i]
+                n_circles[i].set_fill(col, opacity=val).set_stroke(col, width=2.0)
+
+        # Sparse neurons appear (with caption above and below); no flow/interp yet
         self.play(
             Create(arr_sae2n),
-            *ent_only_anims(PATTERNS[ent_pat_idx % len(PATTERNS)]),
-            tracker.animate.set_value(tracker.get_value() + 0.4),
-            run_time=0.4, rate_func=linear,
+            LaggedStart(*[GrowFromCenter(n_circles[i]) for i in range(N)],
+                        lag_ratio=0.09),
+            FadeIn(dots_circle),
+            FadeIn(sparse_dim_lbl), FadeIn(sparse_lbl),
+            *ent_only_anims(pat_sparse_start),
+            tracker.animate.set_value(tracker.get_value() + 1.2),
+            run_time=1.2, rate_func=linear,
         )
         ent_pat_idx += 1
+
+        # Sparse + entangled keep cycling together
+        T_sparse_loop = tracker.get_value()
+        LOOP_SPARSE = [PATTERNS[3], PATTERNS[4], PATTERNS[5],
+                       PATTERNS[0], PATTERNS[1], PATTERNS[2]]
+        for i, pat in enumerate(LOOP_SPARSE):
+            self.play(
+                *ent_sparse_anims(pat),
+                tracker.animate.set_value(T_sparse_loop + (i + 1) * 1.0),
+                run_time=1.0, rate_func=linear,
+            )
+        self.next_slide()
+
+        # Flow diagram (Sankey) + concept labels + "interpretation" caption
         self.play(
             LaggedStart(*[
                 AnimationGroup(
-                    GrowFromCenter(n_circles[i]),
                     FadeIn(primary_sankey[i]),
                     FadeIn(c_txts[i]),
                 )
                 for i in range(N)
             ], lag_ratio=0.09),
-            FadeIn(dots_circle), FadeIn(dots_txt),
-            FadeIn(sparse_dim_lbl), FadeIn(sparse_lbl), FadeIn(interp_lbl),
+            FadeIn(dots_txt), FadeIn(interp_lbl),
             *ent_only_anims(PATTERNS[ent_pat_idx % len(PATTERNS)]),
             tracker.animate.set_value(tracker.get_value() + 1.2),
             run_time=1.2, rate_func=linear,
@@ -386,13 +449,11 @@ class S04Dictionary(Slide):
         self.play(
             FadeIn(secondary_sankey),
             *ent_only_anims(PATTERNS[ent_pat_idx % len(PATTERNS)]),
+            tracker.animate.set_value(tracker.get_value() + 0.4),
             run_time=0.4, rate_func=linear,
         )
 
         # ── Dynamic: video + entangled sectors + sparse concepts ───────────────
-        # Both entangled and sparse start animating immediately (no dead gap).
-        T0 = tracker.get_value()
-
         def all_anims(pattern):
             anims = []
             for c_idx, val in enumerate(pattern):
@@ -423,13 +484,17 @@ class S04Dictionary(Slide):
                     ]
             return anims
 
-        seg = 2.5
-        for i, pat in enumerate(PATTERNS * 2):
+        seg = 5.0
+        # Iterate through all 6 patterns (~30s) so the full animation plays in
+        # this slide before any loop; ends at PATTERNS[0] for a seamless loop.
+        T_init = tracker.get_value()
+        INIT_FULL = [PATTERNS[0], PATTERNS[1], PATTERNS[2],
+                     PATTERNS[3], PATTERNS[4], PATTERNS[5]]
+        for i, pat in enumerate(INIT_FULL):
             self.play(
                 *all_anims(pat),
-                tracker.animate.set_value(T0 + (i + 1) * seg),
-                run_time=seg,
-                rate_func=linear,
+                tracker.animate.set_value(T_init + (i + 1) * seg),
+                run_time=seg, rate_func=linear,
             )
 
-        self.play(tracker.animate.set_value(tracker.get_value() + 3.0), run_time=3.0, rate_func=linear)
+        self.next_slide()

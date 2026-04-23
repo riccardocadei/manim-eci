@@ -246,99 +246,8 @@ class S06Paradox(Slide):
         self.next_slide()
 
         # ══════════════════════════════════════════════════════════════════════
-        # Principal neuron: Z₁ → GREEN (it truly encodes grooming)
-        # ══════════════════════════════════════════════════════════════════════
-        self.play(
-            n_circs[GROOM_IDX].animate.set_stroke(color=GREEN_LIGHT, width=3.5),
-            z_labels[GROOM_IDX].animate.set_color(GREEN_LIGHT),
-            arrows[GROOM_IDX].animate.set_color(GREEN_LIGHT),
-            primary_flows[GROOM_IDX].animate.set_fill(color=GREEN_LIGHT, opacity=0.90),
-            run_time=0.8,
-        )
-        self.wait(0.5)
-        self.next_slide()
-
-        # ══════════════════════════════════════════════════════════════════════
-        # All OTHER neurons also light up RED (entanglement leakage)
-        # ══════════════════════════════════════════════════════════════════════
-        red_anims = []
-
-        for i in range(n_dag):
-            if i == GROOM_IDX:
-                continue
-            red_anims += [
-                n_circs[i].animate.set_stroke(color=RED_LIGHT, width=3.5, opacity=1.0),
-                z_labels[i].animate.set_color(RED_LIGHT).set_opacity(1.0),
-                arrows[i].animate.set_color(RED_LIGHT).set_opacity(0.80),
-            ]
-
-        # Z_m also red
-        red_anims += [
-            z_m_circ.animate.set_stroke(color=RED_LIGHT, width=3.5, opacity=1.0),
-            z_m_lbl.animate.set_color(RED_LIGHT).set_opacity(1.0),
-            arrow_m.animate.set_color(RED_LIGHT).set_opacity(0.80),
-            dots_dag.animate.set_opacity(0.60),
-        ]
-
-        # Secondary flows TO grooming in red with varying opacities
-        sec_opacities = [0.55, 0.25, 0.45, 0.18, 0.38]
-        for k, si in enumerate(sec_to_groom_indices):
-            op = sec_opacities[k % len(sec_opacities)]
-            red_anims.append(
-                secondary_flows[si].animate.set_fill(color=RED_LIGHT, opacity=op)
-            )
-
-        # Revert grooming node (green → white) simultaneously
-        red_anims += [
-            n_circs[GROOM_IDX].animate.set_stroke(color=WHITE_TEXT, width=3.0),
-            z_labels[GROOM_IDX].animate.set_color(WHITE_TEXT),
-            arrows[GROOM_IDX].animate.set_color(WHITE_TEXT),
-            primary_flows[GROOM_IDX].animate.set_fill(color=WHITE_TEXT, opacity=0.95),
-        ]
-
-        self.play(*red_anims, run_time=1.0)
-        self.wait(1)
-        self.next_slide()
-
-        # ══════════════════════════════════════════════════════════════════════
-        # Revert all colored nodes / arrows / flows back to white
-        # ══════════════════════════════════════════════════════════════════════
-        revert_anims = [
-            # z_m: red → white
-            z_m_circ.animate.set_stroke(color=WHITE_TEXT, width=3.0, opacity=1.0),
-            z_m_lbl.animate.set_color(WHITE_TEXT).set_opacity(1.0),
-            arrow_m.animate.set_color(WHITE_TEXT).set_opacity(1.0),
-        ]
-        for i in range(n_dag):
-            if i == GROOM_IDX:
-                continue
-            revert_anims += [
-                n_circs[i].animate.set_stroke(color=WHITE_TEXT, width=3.0, opacity=1.0),
-                z_labels[i].animate.set_color(WHITE_TEXT).set_opacity(1.0),
-                arrows[i].animate.set_color(WHITE_TEXT).set_opacity(1.0),
-            ]
-        for si in sec_to_groom_indices:
-            revert_anims.append(secondary_flows[si].animate.set_fill(color=WHITE_TEXT, opacity=0.35))
-
-        self.play(*revert_anims, run_time=1.0)
-        self.wait(0.3)
-        self.next_slide()
-
-        # ── Quick emphasis: flash all T→Z arrows (scale pulse, no color) ─────
-        all_arrows_group = VGroup(*arrows, arrow_m)
-        self.play(
-            all_arrows_group.animate.set_stroke(width=5.5),
-            run_time=0.4,
-        )
-        self.play(
-            all_arrows_group.animate.set_stroke(width=2.5),
-            run_time=0.4,
-        )
-        self.wait(0.3)
-
-        # ══════════════════════════════════════════════════════════════════════
-        # All concept labels → scale 0.42, with ✓/✗ symbols
-        # grooming → ✓ grooming (green), all others → ✗ concept (red)
+        # Validate Z_1: pulse-bold arrow/node/label (stays white),
+        # swap "grooming" → "✓ grooming" green
         # ══════════════════════════════════════════════════════════════════════
         HIGHLIGHT_SCALE = 0.42
 
@@ -347,17 +256,63 @@ class S06Paradox(Slide):
             lbl.move_to(np.array([concept_x + lbl.get_width() / 2, y, 0]))
             return lbl
 
-        groom_final = _concept_label("✓", "grooming", GREEN_LIGHT, n_circs[GROOM_IDX].get_center()[1])
+        check_lbl = _concept_label(
+            "✓", "grooming", GREEN_LIGHT, n_circs[GROOM_IDX].get_center()[1]
+        )
 
-        color_anims = [Transform(interp_labels[GROOM_IDX], groom_final)]
-        for i in range(n_dag):
-            if i == GROOM_IDX:
-                continue
-            lbl = _concept_label("✗", CONCEPTS[i], RED_LIGHT, n_circs[i].get_center()[1])
-            color_anims.append(Transform(interp_labels[i], lbl))
-        lbl_m = _concept_label("✗", CONCEPT_M, RED_LIGHT, z_m_circ.get_center()[1])
-        color_anims.append(Transform(interp_m, lbl_m))
-
-        self.play(*color_anims, run_time=0.8)
+        self.play(
+            arrows[GROOM_IDX].animate.set_stroke(width=5.5),
+            n_circs[GROOM_IDX].animate.set_stroke(width=5.0),
+            z_labels[GROOM_IDX].animate.scale(1.20),
+            run_time=0.25,
+        )
+        self.play(
+            arrows[GROOM_IDX].animate.set_stroke(width=2.5),
+            n_circs[GROOM_IDX].animate.set_stroke(width=3.0),
+            z_labels[GROOM_IDX].animate.scale(1 / 1.20),
+            Transform(interp_labels[GROOM_IDX], check_lbl),
+            run_time=0.55,
+        )
         self.wait(0.5)
+        self.next_slide()
+
+        # ══════════════════════════════════════════════════════════════════════
+        # Invalidate the other Z's: pulse-bold arrows/nodes/labels,
+        # swap each concept → "✗ [concept]" red
+        # ══════════════════════════════════════════════════════════════════════
+        other_idx = [i for i in range(n_dag) if i != GROOM_IDX]
+
+        self.play(
+            *[arrows[i].animate.set_stroke(width=5.5) for i in other_idx],
+            arrow_m.animate.set_stroke(width=5.5),
+            *[n_circs[i].animate.set_stroke(width=5.0) for i in other_idx],
+            z_m_circ.animate.set_stroke(width=5.0),
+            *[z_labels[i].animate.scale(1.20) for i in other_idx],
+            z_m_lbl.animate.scale(1.20),
+            run_time=0.30,
+        )
+
+        fail_transforms = []
+        for i in other_idx:
+            lbl = _concept_label(
+                "✗", CONCEPTS[i], RED_LIGHT, n_circs[i].get_center()[1]
+            )
+            fail_transforms.append(Transform(interp_labels[i], lbl))
+        lbl_m = _concept_label(
+            "✗", CONCEPT_M, RED_LIGHT, z_m_circ.get_center()[1]
+        )
+        fail_transforms.append(Transform(interp_m, lbl_m))
+
+        self.play(
+            *[arrows[i].animate.set_stroke(width=2.5) for i in other_idx],
+            arrow_m.animate.set_stroke(width=2.5),
+            *[n_circs[i].animate.set_stroke(width=2.0) for i in other_idx],
+            z_m_circ.animate.set_stroke(width=2.0),
+            *[z_labels[i].animate.scale(1 / 1.20) for i in other_idx],
+            z_m_lbl.animate.scale(1 / 1.20),
+            dots_dag.animate.set_opacity(1.0),
+            *fail_transforms,
+            run_time=0.60,
+        )
+        self.wait(1)
         self.next_slide()
