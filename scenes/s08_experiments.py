@@ -6,6 +6,7 @@ from config import *
 
 EXAMPLES_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "data", "synthetic", "examples")
 EXPERIMENT_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "data", "experiment")
+EMOJI_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "emoji")
 
 # ── Top-16 neurons by NES score per treatment ─────────────────────────────────
 
@@ -233,7 +234,7 @@ class S08Experiments(Slide):
         # self.play(FadeOut(stuff_to_clear), run_time=0.6)
 
         FRAMES_DIR = os.path.join(EXPERIMENT_DIR, "frames")
-        FIG_H = 5.2
+        FIG_H = 5.7
 
         # ── Phase 1: bars grow gradually (frame sequence) ────────────────
         N_FRAMES = 15
@@ -263,21 +264,46 @@ class S08Experiments(Slide):
         self.remove(fig_current)
         fig_current = fig_trend
 
-        # ── Phase 2b: ECI paradox label ──────────────────────────────────
-        paradox_text = Text(
-            "Exploratory Causal Inference Paradox",
-            color=RED_LIGHT,
-            t2s={"Exploratory Causal Inference Paradox": ITALIC},
-        ).scale(BODY_SCALE * 1.1)
-        paradox_text.next_to(fig_current, DOWN, buff=0.25)
+        # ── Phase 2b: ECI paradox label (line 1 only) ────────────────────
+        # Real Apple Color Emoji bitmaps, extracted from the system .ttc's
+        # sbix 160ppem strike via fontTools → assets/emoji/u{CP}.png.
+        PAR_SCALE = BODY_SCALE
 
-        self.play(Write(paradox_text), run_time=0.7)
+        lbl1  = Text("Multiple Testing:", color=WHITE_TEXT).scale(PAR_SCALE)
+        lbl2  = Text("NES (ours):",       color=WHITE_TEXT).scale(PAR_SCALE)
+        tail1 = Text(
+            "Precision Collapse",
+            color=WHITE_TEXT,
+            t2s={"Precision Collapse": ITALIC},
+        ).scale(PAR_SCALE)
+
+        EMOJI_H = lbl1.height  # match text line height
+        warn  = ImageMobject(os.path.join(EMOJI_DIR, "u26A0.png")).set_height(EMOJI_H)
+        beach = ImageMobject(os.path.join(EMOJI_DIR, "u1F3D6.png")).set_height(EMOJI_H)
+        sun   = ImageMobject(os.path.join(EMOJI_DIR, "u2600.png")).set_height(EMOJI_H)
+        happy = Group(beach, sun).arrange(RIGHT, buff=0.05)
+
+        # Stack labels right-aligned so colons line up.
+        lbl2.next_to(lbl1, DOWN, buff=0.15, aligned_edge=RIGHT)
+        warn.next_to(lbl1, RIGHT, buff=0.18)
+        tail1.next_to(warn, RIGHT, buff=0.14)
+        happy.next_to(lbl2, RIGHT, buff=0.18)
+        happy.align_to(warn, LEFT)
+
+        line1_group = Group(lbl1, warn, tail1)
+        line2_group = Group(lbl2, happy)
+        paradox_block = Group(line1_group, line2_group)
+        paradox_block.next_to(fig_current, DOWN, buff=0.22)
+
+        self.play(
+            Write(VGroup(lbl1, tail1)),
+            FadeIn(warn, shift=DOWN * 0.1),
+            run_time=0.9,
+        )
         self.wait(0.3)
         self.next_slide()
 
-        # ── Phase 3: NES grows in (frame sequence) ───────────────────────
-        self.play(FadeOut(paradox_text), run_time=0.3)
-
+        # ── Phase 3: NES grows in (frame sequence), then line 2 writes in ──
         nes_frames = []
         for i in range(N_FRAMES):
             img = ImageMobject(os.path.join(FRAMES_DIR, f"add_nes_{i:02d}.png"))
@@ -290,6 +316,12 @@ class S08Experiments(Slide):
             self.remove(nes_frames[i - 1])
             self.add(nes_frames[i])
             self.wait(1/15)
+
+        self.play(
+            Write(lbl2),
+            FadeIn(happy, shift=DOWN * 0.1),
+            run_time=0.9,
+        )
 
         self.wait(0.4)
         self.next_slide()
