@@ -265,41 +265,39 @@ class S08Experiments(Slide):
         fig_current = fig_trend
 
         # ── Phase 2b: ECI paradox label (line 1 only) ────────────────────
-        # Real Apple Color Emoji bitmaps, extracted from the system .ttc's
-        # sbix 160ppem strike via fontTools → assets/emoji/u{CP}.png.
         PAR_SCALE = BODY_SCALE
 
         lbl1  = Text("Multiple Testing:", color=WHITE_TEXT).scale(PAR_SCALE)
         lbl2  = Text("NES (ours):",       color=WHITE_TEXT).scale(PAR_SCALE)
         tail1 = Text(
-            "Precision Collapse",
+            "precision collapse",
             color=WHITE_TEXT,
-            t2s={"Precision Collapse": ITALIC},
+            t2s={"precision collapse": ITALIC},
+        ).scale(PAR_SCALE)
+        tail2 = Text(
+            "precision collapse",
+            color=WHITE_TEXT,
+            t2s={"precision collapse": ITALIC},
         ).scale(PAR_SCALE)
 
-        EMOJI_H = lbl1.height  # match text line height
-        warn  = ImageMobject(os.path.join(EMOJI_DIR, "u26A0.png")).set_height(EMOJI_H)
-        beach = ImageMobject(os.path.join(EMOJI_DIR, "u1F3D6.png")).set_height(EMOJI_H)
-        sun   = ImageMobject(os.path.join(EMOJI_DIR, "u2600.png")).set_height(EMOJI_H)
-        happy = Group(beach, sun).arrange(RIGHT, buff=0.05)
-
-        # Stack labels right-aligned so colons line up.
+        # Stack labels right-aligned so colons line up; tails share a left edge.
         lbl2.next_to(lbl1, DOWN, buff=0.15, aligned_edge=RIGHT)
-        warn.next_to(lbl1, RIGHT, buff=0.18)
-        tail1.next_to(warn, RIGHT, buff=0.14)
-        happy.next_to(lbl2, RIGHT, buff=0.18)
-        happy.align_to(warn, LEFT)
+        tail1.next_to(lbl1, RIGHT, buff=0.22)
+        tail2.next_to(lbl2, RIGHT, buff=0.22)
+        tail2.align_to(tail1, LEFT)
 
-        line1_group = Group(lbl1, warn, tail1)
-        line2_group = Group(lbl2, happy)
-        paradox_block = Group(line1_group, line2_group)
+        strike = Line(
+            tail2.get_left()  + LEFT  * 0.05,
+            tail2.get_right() + RIGHT * 0.05,
+            color=WHITE_TEXT, stroke_width=2.5,
+        )
+
+        line1_group = VGroup(lbl1, tail1)
+        line2_group = VGroup(lbl2, tail2, strike)
+        paradox_block = VGroup(line1_group, line2_group)
         paradox_block.next_to(fig_current, DOWN, buff=0.22)
 
-        self.play(
-            Write(VGroup(lbl1, tail1)),
-            FadeIn(warn, shift=DOWN * 0.1),
-            run_time=0.9,
-        )
+        self.play(Write(line1_group), run_time=0.8)
         self.wait(0.3)
         self.next_slide()
 
@@ -317,11 +315,7 @@ class S08Experiments(Slide):
             self.add(nes_frames[i])
             self.wait(1/15)
 
-        self.play(
-            Write(lbl2),
-            FadeIn(happy, shift=DOWN * 0.1),
-            run_time=0.9,
-        )
+        self.play(Write(line2_group), run_time=0.9)
 
         self.wait(0.4)
         self.next_slide()

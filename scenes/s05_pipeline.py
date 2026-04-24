@@ -358,23 +358,28 @@ class S05Pipeline(Slide):
             r"1 Neuron $\approx$ 1 Concept",
         )
 
-        assumptions = VGroup(a1, a2).arrange(DOWN, buff=0.40)
-        assumptions.move_to(RIGHT * 3.8).align_to(n_circs, UP).shift(DOWN * 0.2)
+        plus_sym = MathTex("+", color=WHITE_TEXT).scale(0.75)
+        eq_sym   = MathTex("=", color=WHITE_TEXT).scale(0.75)
+        EMOJI_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "emoji")
+        warn_emoji = ImageMobject(os.path.join(EMOJI_DIR, "u26A0.png")).set_height(1.3)
 
-        self.play(FadeIn(a1, shift=LEFT * 0.15), run_time=0.7)
+        # Stack: A1, +, A2, =, attention emoji
+        column = Group(a1, plus_sym, a2, eq_sym, warn_emoji).arrange(DOWN, buff=0.22)
+        column.move_to(RIGHT * 3.8).align_to(n_circs, UP).shift(DOWN * 0.2)
+
+        # ── Slide: A1 enters ─────────────────────────────────────────────────
+        self.play(FadeIn(a1, shift=LEFT * 0.15), run_time=0.5)
         self.wait(0.5)
-        self.play(FadeIn(a2, shift=LEFT * 0.15), run_time=0.7)
+        self.next_slide()
+
+        # ── Slide: "+", then A2 enters ───────────────────────────────────────
+        self.play(FadeIn(plus_sym, scale=0.8), run_time=0.3)
+        self.play(FadeIn(a2, shift=LEFT * 0.15), run_time=0.5)
+        self.wait(0.5)
+        self.next_slide()
+
+        # ── Slide: "=", then large attention emoji ───────────────────────────
+        self.play(FadeIn(eq_sym, scale=0.8), run_time=0.3)
+        self.play(FadeIn(warn_emoji, scale=0.6), run_time=0.7)
         self.wait(1)
-        self.next_slide()
-
-        # ── Emphasize A1 ─────────────────────────────────────────────────────
-        self.play(a1.animate.scale(1.15), run_time=0.4)
-        self.play(a1.animate.scale(1 / 1.15), run_time=0.4)
-        self.wait(0.5)
-        self.next_slide()
-
-        # ── Emphasize A2 ─────────────────────────────────────────────────────
-        self.play(a2.animate.scale(1.15), run_time=0.4)
-        self.play(a2.animate.scale(1 / 1.15), run_time=0.4)
-        self.wait(0.5)
         self.next_slide()

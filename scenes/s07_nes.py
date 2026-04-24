@@ -388,3 +388,71 @@ class S07NES(Slide):
         self.play(Transform(bar1, bar_final), run_time=0.6)
         self.wait(1)
         self.next_slide()
+
+        # ==================================================================
+        # FINAL — Shift DAG left + show assumptions pipeline (as in s05)
+        # ==================================================================
+
+        # Remove the (dimmed) formula on the right
+        self.play(FadeOut(VGroup(form3_z2, val3_z2)), run_time=0.4)
+
+        # Collect every DAG + text mobject so they shift together
+        dag_group = VGroup(
+            T, Y1, Y2, Z1, Z2, Z3,
+            a_T_Y1, a_T_Y2,
+            bnd_Y1_Z1, bnd_Y1_Z2, bnd_Y2_Z3, bnd_Y2_Z2,
+            lbl_T, lbl_Y_grp, lbl_Z_grp,
+            x_Y1, x_Y2,
+            bar1,
+        )
+        self.play(dag_group.animate.shift(LEFT * 3.0), run_time=0.8)
+
+        # ── Assumption boxes ──────────────────────────────────────────────
+        BOX_W     = 5.0
+        BOX_PAD   = 0.28
+        BOX_COLOR = WHITE_TEXT
+
+        def make_assumption(label_prefix, label_name, *body_lines):
+            lbl_tex   = Tex(
+                rf"\textbf{{{label_prefix}:}} \textit{{{label_name}}}",
+                color=WHITE_TEXT,
+            ).scale(0.44)
+            body_texs = [Tex(line, color=GRAY_TEXT).scale(0.40) for line in body_lines]
+            content   = VGroup(lbl_tex, *body_texs).arrange(DOWN, buff=0.08)
+            box = Rectangle(
+                width=BOX_W,
+                height=content.get_height() + 2 * BOX_PAD,
+                color=BOX_COLOR, stroke_width=1.4, fill_opacity=0,
+            )
+            content.move_to(box)
+            lbl_tex.shift(LEFT * (lbl_tex.get_left()[0] - (box.get_left()[0] + BOX_PAD)))
+            for body in body_texs:
+                body.move_to([box.get_center()[0], body.get_center()[1], 0])
+            return VGroup(box, content)
+
+        a1 = make_assumption(
+            "Assumption 1", "Sufficiency",
+            r"$H(Y|X)=H(Y|Z)\approx 0$",
+        )
+        a2 = make_assumption(
+            "Assumption 2", "Principal Alignment",
+            r"1 Neuron $\approx$ 1 Concept",
+        )
+
+        plus_sym = MathTex("+", color=WHITE_TEXT).scale(0.75)
+        eq_sym   = MathTex("=", color=WHITE_TEXT).scale(0.75)
+        EMOJI_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "emoji")
+        party_emoji = ImageMobject(os.path.join(EMOJI_DIR, "u1F389.png")).set_height(1.3)
+
+        # Stack: A1, +, A2, =, party emoji
+        column = Group(a1, plus_sym, a2, eq_sym, party_emoji).arrange(DOWN, buff=0.22)
+        column.move_to(RIGHT * 3.8).align_to(Z1, UP).shift(DOWN * 0.2)
+
+        # ── Smooth reveal: A1 → + → A2 → = → 🎉 (no slide breaks) ────────
+        self.play(FadeIn(a1, shift=LEFT * 0.15), run_time=0.5)
+        self.play(FadeIn(plus_sym, scale=0.8), run_time=0.3)
+        self.play(FadeIn(a2, shift=LEFT * 0.15), run_time=0.5)
+        self.play(FadeIn(eq_sym, scale=0.8), run_time=0.3)
+        self.play(FadeIn(party_emoji, scale=0.6), run_time=0.7)
+        self.wait(1)
+        self.next_slide()
