@@ -13,7 +13,7 @@ class S11ThankYou(Slide):
         title.move_to(UP * 0.6)
 
         subtitle_pt = Text(
-            "(Obrigado pela sua atenção)",
+            "Obrigado",
             color=GRAY_TEXT,
             slant=ITALIC,
         ).scale(BODY_SCALE)

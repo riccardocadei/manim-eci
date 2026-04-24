@@ -221,11 +221,10 @@ class S05Pipeline(Slide):
             z_m_circ.get_left() + LEFT * 0.05,
         )
 
-        # Single "?" above the arrow fan, slightly below title area
+        # Anchor above the arrow fan (used later for the hypothesis label)
         hyp_x = (T_circ.get_right()[0] + n_circs.get_left()[0]) / 2
         hyp_y = n_circs[0].get_center()[1] + 0.15
         hyp_anchor = np.array([hyp_x, hyp_y, 0])
-        q_single = MathTex("?", color=WHITE_TEXT).scale(0.70).move_to(hyp_anchor)
 
         # ── Transition: gifs → DAG ────────────────────────────────────────────
         # Step 1: Replace treatment gif with T node (at final DAG position)
@@ -256,7 +255,7 @@ class S05Pipeline(Slide):
         )
         self.next_slide()
 
-        # Step 3: Add Sankey flows, concept labels, arrows, "?"
+        # Step 3: Add Sankey flows, concept labels, arrows
         self.play(
             *[FadeIn(primary_flows[i]) for i in range(len(all_nodes))],
             *[FadeIn(interp_labels[i]) for i in range(n_dag)],
@@ -271,8 +270,38 @@ class S05Pipeline(Slide):
             Create(arrow_m),
             run_time=1.4,
         )
-        self.play(FadeIn(q_single, scale=0.5), run_time=0.5)
-        self.wait(1)
+
+        # Cascade emphasis: bold each arrow from top to bottom, then restore
+        all_arrows_list = [*arrows, arrow_m]
+
+        def _bold_version(arr):
+            start, end = arr.get_start(), arr.get_end()
+            length = np.linalg.norm(end - start)
+            return Arrow(
+                start, end,
+                color=WHITE_TEXT, buff=0, stroke_width=8.0,
+                max_tip_length_to_length_ratio=0.225 / max(length, 0.01),
+            )
+
+        bold_targets       = [_bold_version(arr) for arr in all_arrows_list]
+        original_snapshots = [arr.copy()         for arr in all_arrows_list]
+
+        self.play(
+            LaggedStart(
+                *[
+                    Succession(
+                        Transform(arr, bold),
+                        Transform(arr, orig),
+                    )
+                    for arr, bold, orig in zip(
+                        all_arrows_list, bold_targets, original_snapshots
+                    )
+                ],
+                lag_ratio=0.5,
+            ),
+            run_time=4.0,
+        )
+        self.wait(0.5)
         self.next_slide()
 
         # ── Hypothesis: highlight 2 neurons ──────────────────────────────────
@@ -308,7 +337,6 @@ class S05Pipeline(Slide):
             secondary_flows.animate.set_fill(opacity=0.08),
         ]
 
-        self.play(FadeOut(q_single, scale=0.8), run_time=0.3)
         self.play(FadeIn(gt_lbl, scale=1.1), *gt_anims, run_time=0.8)
         self.wait(1)
         self.next_slide()

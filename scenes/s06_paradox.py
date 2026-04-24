@@ -262,16 +262,12 @@ class S06Paradox(Slide):
 
         self.play(
             arrows[GROOM_IDX].animate.set_stroke(width=5.5),
-            n_circs[GROOM_IDX].animate.set_stroke(width=5.0),
-            z_labels[GROOM_IDX].animate.scale(1.20),
-            run_time=0.25,
+            run_time=0.50,
         )
         self.play(
             arrows[GROOM_IDX].animate.set_stroke(width=2.5),
-            n_circs[GROOM_IDX].animate.set_stroke(width=3.0),
-            z_labels[GROOM_IDX].animate.scale(1 / 1.20),
             Transform(interp_labels[GROOM_IDX], check_lbl),
-            run_time=0.55,
+            run_time=1.10,
         )
         self.wait(0.5)
         self.next_slide()
@@ -285,11 +281,7 @@ class S06Paradox(Slide):
         self.play(
             *[arrows[i].animate.set_stroke(width=5.5) for i in other_idx],
             arrow_m.animate.set_stroke(width=5.5),
-            *[n_circs[i].animate.set_stroke(width=5.0) for i in other_idx],
-            z_m_circ.animate.set_stroke(width=5.0),
-            *[z_labels[i].animate.scale(1.20) for i in other_idx],
-            z_m_lbl.animate.scale(1.20),
-            run_time=0.30,
+            run_time=0.60,
         )
 
         fail_transforms = []
@@ -306,13 +298,9 @@ class S06Paradox(Slide):
         self.play(
             *[arrows[i].animate.set_stroke(width=2.5) for i in other_idx],
             arrow_m.animate.set_stroke(width=2.5),
-            *[n_circs[i].animate.set_stroke(width=2.0) for i in other_idx],
-            z_m_circ.animate.set_stroke(width=2.0),
-            *[z_labels[i].animate.scale(1 / 1.20) for i in other_idx],
-            z_m_lbl.animate.scale(1 / 1.20),
             dots_dag.animate.set_opacity(1.0),
             *fail_transforms,
-            run_time=0.60,
+            run_time=1.20,
         )
         self.wait(1)
         self.next_slide()

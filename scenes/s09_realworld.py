@@ -53,22 +53,37 @@ def _animated_gif_grid(folder, cols=4, rows=2, h=0.75, gap=0.05, seed=42):
     return g, anim_data
 
 
-def _start_gif_updaters(anim_data):
-    """Attach frame-cycling updaters to every animated GIF ImageMobject."""
+def _start_gif_updaters(anim_data, opacity_tracker=None):
+    """Attach frame-cycling updaters to every animated GIF ImageMobject.
+
+    `opacity_tracker` is an optional ValueTracker whose value is applied as a
+    row-wide opacity multiplier (combined with each img's `_gif_base_opacity`
+    via min). This lets `.animate.set_value(x)` smoothly dim all gifs in a row
+    even though the updater overwrites pixel_array every frame.
+    """
     for img, frames, duration in anim_data:
         img._gif_frames = frames
         img._gif_duration = duration
         img._gif_n = len(frames)
         img._gif_elapsed = [0.0]
-        img._gif_cur = [0]
+        img._gif_cur = [-1]
+        img._gif_last_op = [None]
 
-        def _upd(mob, dt):
+        def _upd(mob, dt, tracker=opacity_tracker):
             mob._gif_elapsed[0] += dt
             total = mob._gif_n * mob._gif_duration
             idx = int((mob._gif_elapsed[0] % total) / mob._gif_duration) % mob._gif_n
-            if idx != mob._gif_cur[0]:
+            base = float(getattr(mob, "_gif_base_opacity", 1.0))
+            row_op = float(tracker.get_value()) if tracker is not None else 1.0
+            op = min(base, row_op)
+            if idx != mob._gif_cur[0] or op != mob._gif_last_op[0]:
                 mob._gif_cur[0] = idx
-                mob.pixel_array = mob._gif_frames[idx]
+                mob._gif_last_op[0] = op
+                frame = mob._gif_frames[idx]
+                if op < 0.999:
+                    frame = frame.copy()
+                    frame[..., 3] = (frame[..., 3].astype(np.float32) * op).astype(np.uint8)
+                mob.pixel_array = frame
 
         img.add_updater(_upd)
 
@@ -92,8 +107,10 @@ def _neuron_row(neuron_id, quiet_folder, top_folder, interp_lines, y_center):
     grid_quiet, anim_quiet = _animated_gif_grid(quiet_folder, cols=4, rows=2, h=0.75, gap=0.05)
     grid_top, anim_top = _animated_gif_grid(top_folder, cols=4, rows=2, h=0.75, gap=0.05)
 
-    # Dim the quiet grid
+    # Dim the quiet grid (and remember the base so the gif updater can enforce it)
     grid_quiet.set_opacity(0.45)
+    for img, _, _ in anim_quiet:
+        img._gif_base_opacity = 0.45
 
     # Interpretation (multi-line VGroup, white)
     interp_parts = []
@@ -170,8 +187,10 @@ class S09RealWorld(Slide):
             LaggedStart(*[FadeIn(im, shift=UP * 0.1) for im in grids1[0]], lag_ratio=0.04),
             run_time=0.8,
         )
-        # Start GIF updaters as soon as grids appear
-        _start_gif_updaters(anim1)
+        # Start GIF updaters as soon as grids appear (opacity tracker lets us
+        # dim the gifs smoothly during the conclusion overlay)
+        dim1 = ValueTracker(1.0)
+        _start_gif_updaters(anim1, opacity_tracker=dim1)
         self.play(
             FadeIn(labels1[2]),  # "activated" header
             LaggedStart(*[FadeIn(im, shift=UP * 0.1) for im in grids1[1]], lag_ratio=0.04),
@@ -185,6 +204,24 @@ class S09RealWorld(Slide):
         self.wait(1.0)
         self.play(FadeIn(labels1[5], scale=1.5), run_time=0.4)  # green check
         self.wait(1.6)
+        self.next_slide(loop=True)
+        self.wait(1.6)
+        self.next_slide()
+
+        # ── Conclusion 1: dim full row + readable overlay ────────────────────
+        conclusion1 = MathTex(
+            r"\text{NEMS hypothesis} \cong \text{biologists validated prior}",
+            color=WHITE_TEXT,
+        ).scale(0.9)
+        conclusion1.move_to([0, 1.0, 0])
+
+        self.play(
+            labels1.animate.set_opacity(0.35),
+            dim1.animate.set_value(0.45),
+            FadeIn(conclusion1, shift=UP * 0.15),
+            run_time=0.8,
+        )
+        self.wait(1.0)
         self.next_slide(loop=True)
         self.wait(1.6)
         self.next_slide()
@@ -216,8 +253,10 @@ class S09RealWorld(Slide):
             LaggedStart(*[FadeIn(im, shift=UP * 0.1) for im in grids2[0]], lag_ratio=0.04),
             run_time=0.8,
         )
-        # Start GIF updaters as soon as grids appear
-        _start_gif_updaters(anim2)
+        # Start GIF updaters as soon as grids appear (opacity tracker lets us
+        # dim the gifs smoothly during the conclusion overlay)
+        dim2 = ValueTracker(1.0)
+        _start_gif_updaters(anim2, opacity_tracker=dim2)
         self.play(
             FadeIn(labels2[2]),  # "activated" header
             LaggedStart(*[FadeIn(im, shift=UP * 0.1) for im in grids2[1]], lag_ratio=0.04),
@@ -231,5 +270,23 @@ class S09RealWorld(Slide):
         self.wait(1.0)
         self.play(FadeIn(labels2[5], scale=1.5), run_time=0.4)  # green check
         self.wait(1.6)
+        self.next_slide(loop=True)
+        self.wait(1.6)
+        self.next_slide()
+
+        # ── Conclusion 2: dim full row + readable overlay ────────────────────
+        conclusion2 = Tex(
+            "NEMS spots Experimental Design error",
+            color=WHITE_TEXT,
+        ).scale(0.9)
+        conclusion2.move_to([0, -2.2, 0])
+
+        self.play(
+            labels2.animate.set_opacity(0.35),
+            dim2.animate.set_value(0.45),
+            FadeIn(conclusion2, shift=UP * 0.15),
+            run_time=0.8,
+        )
+        self.wait(1.0)
         self.next_slide(loop=True)
         self.wait(1.6)
