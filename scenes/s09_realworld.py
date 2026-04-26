@@ -107,11 +107,6 @@ def _neuron_row(neuron_id, quiet_folder, top_folder, interp_lines, y_center):
     grid_quiet, anim_quiet = _animated_gif_grid(quiet_folder, cols=4, rows=2, h=0.75, gap=0.05)
     grid_top, anim_top = _animated_gif_grid(top_folder, cols=4, rows=2, h=0.75, gap=0.05)
 
-    # Dim the quiet grid (and remember the base so the gif updater can enforce it)
-    grid_quiet.set_opacity(0.45)
-    for img, _, _ in anim_quiet:
-        img._gif_base_opacity = 0.45
-
     # Interpretation (multi-line VGroup, white)
     interp_parts = []
     for txt, rel_scale in interp_lines:
@@ -210,7 +205,7 @@ class S09RealWorld(Slide):
 
         # ── Conclusion 1: dim full row + readable overlay ────────────────────
         conclusion1 = MathTex(
-            r"\text{NEMS hypothesis} \cong \text{biologists validated prior}",
+            r"\text{NES hypothesis} \cong \text{biologists validated prior}",
             color=WHITE_TEXT,
         ).scale(0.9)
         conclusion1.move_to([0, 1.0, 0])
@@ -276,7 +271,7 @@ class S09RealWorld(Slide):
 
         # ── Conclusion 2: dim full row + readable overlay ────────────────────
         conclusion2 = Tex(
-            "NEMS spots Experimental Design error",
+            "NES spots Experimental Design error",
             color=WHITE_TEXT,
         ).scale(0.9)
         conclusion2.move_to([0, -2.2, 0])
