@@ -14,7 +14,7 @@ class S21ThankYou(Slide):
         # X (Twitter) handle
         logo = SVGMobject(
             os.path.join(os.path.dirname(__file__), "..", "assets", "x_logo.svg")
-        ).set(height=0.32)
+        ).set(height=0.24)
         handle = Text("@riccardocadeii", color=GRAY_TEXT).scale(SMALL_SCALE)
         social = VGroup(logo, handle).arrange(RIGHT, buff=0.18)
         social.next_to(title, DOWN, buff=0.6)
