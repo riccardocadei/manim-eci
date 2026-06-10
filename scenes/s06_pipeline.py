@@ -33,7 +33,7 @@ class S06Pipeline(Slide):
         self.camera.background_color = BG
 
         # ── Title ─────────────────────────────────────────────────────────────
-        title = slide_title("Treatment Effect Identification")
+        title = slide_title("Exploratory Causal Inference")
         self.play(Write(title), run_time=0.8)
         self.wait(0.5)
         self.next_slide()
@@ -221,11 +221,10 @@ class S06Pipeline(Slide):
             z_m_circ.get_left() + LEFT * 0.05,
         )
 
-        # Single "?" above the arrow fan, slightly below title area
+        # Anchor above the arrow fan (used later for the hypothesis label)
         hyp_x = (T_circ.get_right()[0] + n_circs.get_left()[0]) / 2
         hyp_y = n_circs[0].get_center()[1] + 0.15
         hyp_anchor = np.array([hyp_x, hyp_y, 0])
-        q_single = MathTex("?", color=WHITE_TEXT).scale(0.70).move_to(hyp_anchor)
 
         # ── Transition: gifs → DAG ────────────────────────────────────────────
         # Step 1: Replace treatment gif with T node (at final DAG position)
@@ -256,7 +255,7 @@ class S06Pipeline(Slide):
         )
         self.next_slide()
 
-        # Step 3: Add Sankey flows, concept labels, arrows, "?"
+        # Step 3: Add Sankey flows, concept labels, arrows
         self.play(
             *[FadeIn(primary_flows[i]) for i in range(len(all_nodes))],
             *[FadeIn(interp_labels[i]) for i in range(n_dag)],
@@ -271,8 +270,38 @@ class S06Pipeline(Slide):
             Create(arrow_m),
             run_time=1.4,
         )
-        self.play(FadeIn(q_single, scale=0.5), run_time=0.5)
-        self.wait(1)
+
+        # Cascade emphasis: bold each arrow from top to bottom, then restore
+        all_arrows_list = [*arrows, arrow_m]
+
+        def _bold_version(arr):
+            start, end = arr.get_start(), arr.get_end()
+            length = np.linalg.norm(end - start)
+            return Arrow(
+                start, end,
+                color=WHITE_TEXT, buff=0, stroke_width=8.0,
+                max_tip_length_to_length_ratio=0.225 / max(length, 0.01),
+            )
+
+        bold_targets       = [_bold_version(arr) for arr in all_arrows_list]
+        original_snapshots = [arr.copy()         for arr in all_arrows_list]
+
+        self.play(
+            LaggedStart(
+                *[
+                    Succession(
+                        Transform(arr, bold),
+                        Transform(arr, orig),
+                    )
+                    for arr, bold, orig in zip(
+                        all_arrows_list, bold_targets, original_snapshots
+                    )
+                ],
+                lag_ratio=0.5,
+            ),
+            run_time=4.0,
+        )
+        self.wait(0.5)
         self.next_slide()
 
         # ── Hypothesis: highlight 2 neurons ──────────────────────────────────
@@ -308,7 +337,6 @@ class S06Pipeline(Slide):
             secondary_flows.animate.set_fill(opacity=0.08),
         ]
 
-        self.play(FadeOut(q_single, scale=0.8), run_time=0.3)
         self.play(FadeIn(gt_lbl, scale=1.1), *gt_anims, run_time=0.8)
         self.wait(1)
         self.next_slide()
@@ -330,47 +358,56 @@ class S06Pipeline(Slide):
         BOX_PAD   = 0.28
         BOX_COLOR = WHITE_TEXT
 
-        def make_assumption(label, *body_lines):
-            lbl_tex   = Tex(rf"\textbf{{{label}}}", color=WHITE_TEXT).scale(0.44)
+        def make_assumption(label_prefix, label_name, *body_lines):
+            lbl_tex   = Tex(
+                rf"\textbf{{{label_prefix}:}} \textit{{{label_name}}}",
+                color=WHITE_TEXT,
+            ).scale(0.44)
             body_texs = [Tex(line, color=GRAY_TEXT).scale(0.40) for line in body_lines]
-            content   = VGroup(lbl_tex, *body_texs).arrange(DOWN, buff=0.08, aligned_edge=LEFT)
+            content   = VGroup(lbl_tex, *body_texs).arrange(DOWN, buff=0.08)
             box = Rectangle(
                 width=BOX_W,
                 height=content.get_height() + 2 * BOX_PAD,
                 color=BOX_COLOR, stroke_width=1.4, fill_opacity=0,
             )
-            # Centre vertically, then pin left edge to box left + padding
             content.move_to(box)
-            content.shift(LEFT * (content.get_left()[0] - (box.get_left()[0] + BOX_PAD)))
+            # Pin label to left edge; keep body lines centred
+            lbl_tex.shift(LEFT * (lbl_tex.get_left()[0] - (box.get_left()[0] + BOX_PAD)))
+            for body in body_texs:
+                body.move_to([box.get_center()[0], body.get_center()[1], 0])
             return VGroup(box, content)
 
         a1 = make_assumption(
-            "Assumption 1:",
-            r"effects entangled in the post-treatment",
-            r"observation, e.g., visible behaviour",
+            "Assumption 1", "Sufficiency",
+            r"$H(Y|X)=H(Y|Z)\approx 0$",
         )
         a2 = make_assumption(
-            "Assumption 2:",
-            r"effect concepts $\sim$retrieved by dictionary learning",
+            "Assumption 2", "Principal Alignment",
+            r"1 Neuron $\approx$ 1 Concept",
         )
 
-        assumptions = VGroup(a1, a2).arrange(DOWN, buff=0.40)
-        assumptions.move_to(RIGHT * 3.8).align_to(n_circs, UP).shift(DOWN * 0.2)
+        plus_sym = MathTex("+", color=WHITE_TEXT).scale(0.75)
+        eq_sym   = MathTex("=", color=WHITE_TEXT).scale(0.75)
+        EMOJI_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "emoji")
+        warn_emoji = ImageMobject(os.path.join(EMOJI_DIR, "u26A0.png")).set_height(1.3)
 
-        self.play(FadeIn(a1, shift=LEFT * 0.15), run_time=0.7)
+        # Stack: A1, +, A2, =, attention emoji
+        column = Group(a1, plus_sym, a2, eq_sym, warn_emoji).arrange(DOWN, buff=0.22)
+        column.move_to(RIGHT * 3.8).align_to(n_circs, UP).shift(DOWN * 0.2)
+
+        # ── Slide: A1 enters ─────────────────────────────────────────────────
+        self.play(FadeIn(a1, shift=LEFT * 0.15), run_time=0.5)
         self.wait(0.5)
-        self.play(FadeIn(a2, shift=LEFT * 0.15), run_time=0.7)
+        self.next_slide()
+
+        # ── Slide: "+", then A2 enters ───────────────────────────────────────
+        self.play(FadeIn(plus_sym, scale=0.8), run_time=0.3)
+        self.play(FadeIn(a2, shift=LEFT * 0.15), run_time=0.5)
+        self.wait(0.5)
+        self.next_slide()
+
+        # ── Slide: "=", then large attention emoji ───────────────────────────
+        self.play(FadeIn(eq_sym, scale=0.8), run_time=0.3)
+        self.play(FadeIn(warn_emoji, scale=0.6), run_time=0.7)
         self.wait(1)
-        self.next_slide()
-
-        # ── Emphasize A1 ─────────────────────────────────────────────────────
-        self.play(a1.animate.scale(1.15), run_time=0.4)
-        self.play(a1.animate.scale(1 / 1.15), run_time=0.4)
-        self.wait(0.5)
-        self.next_slide()
-
-        # ── Emphasize A2 ─────────────────────────────────────────────────────
-        self.play(a2.animate.scale(1.15), run_time=0.4)
-        self.play(a2.animate.scale(1 / 1.15), run_time=0.4)
-        self.wait(0.5)
         self.next_slide()

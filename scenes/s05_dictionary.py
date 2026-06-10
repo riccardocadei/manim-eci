@@ -154,8 +154,8 @@ class S05Dictionary(Slide):
         vit_shape.move_to([vid.get_right()[0] + ARROW_GAP + vit_shape.width / 2, y0, 0])
 
         vit_lbl = VGroup(
-            Text("ViT",      color=BLUE_LIGHT).scale(0.30),
-            Text("(frozen)", color=BLUE_LIGHT).scale(0.24),
+            Text("ViT",      color=BLUE_LIGHT).scale(0.38),
+            Text("(frozen)", color=BLUE_LIGHT).scale(0.30),
         ).arrange(DOWN, buff=0.03)
         vit_lbl.next_to(vit_shape, DOWN, buff=0.10)
 
@@ -172,10 +172,10 @@ class S05Dictionary(Slide):
             [vit_shape.get_right()[0] + ARROW_GAP + ent_neurons.width / 2, y0, 0]
         )
 
-        ent_dots = Text("⋮", color=GRAY_TEXT).scale(0.38)
+        ent_dots = Text("⋮", color=GRAY_TEXT).scale(0.48)
         ent_dots.next_to(ent_neurons, DOWN, buff=0.15)
 
-        ent_dim_lbl = MathTex(r"\sim 10^{2\text{-}3}", color=GRAY_TEXT).scale(0.30)
+        ent_dim_lbl = MathTex(r"\sim 10^{2\text{-}3}", color=GRAY_TEXT).scale(0.52)
         ent_dim_lbl.next_to(ent_neurons, UP, buff=0.12)
 
         arr_vit2ent = arrow(vit_shape.get_right(), ent_neurons.get_left())
@@ -187,8 +187,8 @@ class S05Dictionary(Slide):
         )
 
         sae_lbl = VGroup(
-            Text("SAE",       color=PURPLE_LIGHT).scale(0.30),
-            Text("(encoder)", color=PURPLE_LIGHT).scale(0.24),
+            Text("SAE",       color=PURPLE_LIGHT).scale(0.38),
+            Text("(encoder)", color=PURPLE_LIGHT).scale(0.30),
         ).arrange(DOWN, buff=0.03)
         sae_lbl.next_to(sae_shape, DOWN, buff=0.10)
 
@@ -205,7 +205,7 @@ class S05Dictionary(Slide):
         )
 
         c_txts = VGroup(*[
-            Text(CONCEPTS[i], color=DIM_GRAY).scale(0.26)
+            Text(CONCEPTS[i], color=DIM_GRAY).scale(0.32)
             .next_to(n_circles[i], RIGHT, buff=SANKEY_GAP_S4)
             for i in range(N)
         ])
@@ -213,7 +213,7 @@ class S05Dictionary(Slide):
         dots_circle = Circle(radius=r_n, color=DIM_GRAY,
                              fill_color=DIM_GRAY, fill_opacity=0.12, stroke_width=1.0)
         dots_circle.next_to(n_circles, DOWN, buff=0.21)
-        dots_txt = Text("...", color=DIM_GRAY).scale(0.32) \
+        dots_txt = Text("...", color=DIM_GRAY).scale(0.38) \
             .next_to(dots_circle, RIGHT, buff=SANKEY_GAP_S4)
 
         # ── Sankey ribbons: sparse neuron → concept label ─────────────────────
@@ -268,19 +268,25 @@ class S05Dictionary(Slide):
             if i != j
         ])
 
-        sparse_dim_lbl = MathTex(r"\sim 10^{3\text{-}4}", color=GRAY_TEXT).scale(0.30)
+        sparse_dim_lbl = MathTex(r"\sim 10^{3\text{-}4}", color=GRAY_TEXT).scale(0.52)
         sparse_dim_lbl.next_to(n_circles, UP, buff=0.12)
 
         arr_sae2n = arrow(sae_shape.get_right(), n_circles.get_left())
 
         # ── Section labels (same y baseline, each fades in with its component) ──
-        LSCALE = 0.28
+        LSCALE = 0.36
         vid_lbl       = VGroup(
             Text("post-treatment observation", color=WHITE_TEXT).scale(LSCALE),
             Text("(video)",                    color=WHITE_TEXT).scale(LSCALE),
         ).arrange(DOWN, buff=0.04)
-        entangled_lbl = Text("entangled representation", color=WHITE_TEXT).scale(LSCALE)
-        sparse_lbl    = Text("sparse representation", color=WHITE_TEXT).scale(LSCALE)
+        entangled_lbl = VGroup(
+            Text("entangled",      color=WHITE_TEXT).scale(LSCALE),
+            Text("representation", color=WHITE_TEXT).scale(LSCALE),
+        ).arrange(DOWN, buff=0.04)
+        sparse_lbl    = VGroup(
+            Text("sparse",         color=WHITE_TEXT).scale(LSCALE),
+            Text("representation", color=WHITE_TEXT).scale(LSCALE),
+        ).arrange(DOWN, buff=0.04)
         interp_lbl    = Text("interpretation",        color=WHITE_TEXT).scale(LSCALE)
 
         label_y = dots_circle.get_bottom()[1] - 0.22
@@ -342,8 +348,8 @@ class S05Dictionary(Slide):
 
         # ── Animations ────────────────────────────────────────────────────────
         self.play(Write(title), run_time=0.8)
+        self.next_slide()
         self.play(FadeIn(per_obs, shift=DOWN * 0.06), run_time=0.4)
-        self.play(tracker.animate.set_value(tracker.get_value() + 1.1), run_time=1.1, rate_func=linear)
 
         self.play(
             FadeIn(vid), FadeIn(vid_lbl),
@@ -351,9 +357,6 @@ class S05Dictionary(Slide):
             run_time=0.5, rate_func=linear,
         )
         self.play(tracker.animate.set_value(tracker.get_value() + 3.0), run_time=3.0, rate_func=linear)
-
-        # Loop: video keeps playing (40 frames @ 10fps = 4s for seamless wrap)
-        self.next_slide(loop=True)
         self.play(tracker.animate.set_value(tracker.get_value() + 4.0), run_time=4.0, rate_func=linear)
         self.next_slide()
 
@@ -500,16 +503,4 @@ class S05Dictionary(Slide):
                 run_time=seg, rate_func=linear,
             )
 
-        # Idle loop: keep iterating; returns to PATTERNS[5] for seamless loop
-        self.next_slide(loop=True)
-        T0 = tracker.get_value()
-        LOOP_FULL = [PATTERNS[0], PATTERNS[1], PATTERNS[2],
-                     PATTERNS[3], PATTERNS[4], PATTERNS[5]]
-        for i, pat in enumerate(LOOP_FULL):
-            self.play(
-                *all_anims(pat),
-                tracker.animate.set_value(T0 + (i + 1) * seg),
-                run_time=seg,
-                rate_func=linear,
-            )
         self.next_slide()

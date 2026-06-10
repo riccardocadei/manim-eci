@@ -6,6 +6,7 @@ from config import *
 
 EXAMPLES_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "data", "synthetic", "examples")
 EXPERIMENT_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "data", "experiment")
+EMOJI_DIR = os.path.join(os.path.dirname(__file__), "..", "assets", "emoji")
 
 # ── Top-16 neurons by NES score per treatment ─────────────────────────────────
 
@@ -135,104 +136,105 @@ class S09Experiments(Slide):
         self.wait(0.3)
         self.next_slide()
 
-        # ── Layout constants ──────────────────────────────────────────────────
-        CHART_X     = -4.0
-        IMG_X       =  1.4
-        CHART_SHIFT =  0.35
-        Y1, Y2      =  1.3, -2.2
-
-        # ── Show both effect titles first ─────────────────────────────────────
-        lbl1 = Text(
-            "Effect 1: wearing hat", color=WHITE_TEXT,
-            t2s={"wearing hat": ITALIC},
-        ).scale(BODY_SCALE)
-        lbl1.move_to([CHART_X, Y1 + 1.3, 0], aligned_edge=LEFT)
-
-        lbl2 = Text(
-            "Effect 2: wearing sunglasses", color=WHITE_TEXT,
-            t2s={"wearing sunglasses": ITALIC},
-        ).scale(BODY_SCALE)
-        lbl2.move_to([CHART_X, Y2 + 1.3, 0], aligned_edge=LEFT)
-
-        self.play(
-            FadeIn(lbl1, shift=RIGHT * 0.1),
-            FadeIn(lbl2, shift=RIGHT * 0.1),
-            run_time=0.7,
-        )
-        self.wait(0.3)
-        self.next_slide()
-
-        # ── Effects 1 & 2: bar charts (parallel) ──────────────────────────────
-        chart1 = _bar_chart(HAT_DATA)
-        chart1.move_to([CHART_X, Y1, 0])
-        chart2 = _bar_chart(GLASSES_DATA)
-        chart2.move_to([CHART_X, Y2, 0])
-
-        lbl1.generate_target()
-        lbl1.target.next_to(chart1, UP, buff=0.20, aligned_edge=LEFT)
-        lbl2.generate_target()
-        lbl2.target.next_to(chart2, UP, buff=0.20, aligned_edge=LEFT)
-
-        self.play(
-            MoveToTarget(lbl1),
-            MoveToTarget(lbl2),
-            LaggedStart(*[FadeIn(r, shift=RIGHT * 0.06) for r in chart1], lag_ratio=0.04),
-            LaggedStart(*[FadeIn(r, shift=RIGHT * 0.06) for r in chart2], lag_ratio=0.04),
-            run_time=1.0,
-        )
-        self.wait(0.3)
-        self.next_slide()
-
-        # ── Effects 1 & 2: highlight → fly → images (parallel) ────────────────
-        hdr1_n, hdr1_d, imgs1, badge1 = _build_panel("N_38",   r"Z_{38}",   Y1, IMG_X)
-        hdr2_n, hdr2_d, imgs2, badge2 = _build_panel("N_6051", r"Z_{6051}", Y2, IMG_X)
-
-        # Step 1: highlight top bar of both charts
-        self.play(
-            *_highlight_anim(chart1, idx=0),
-            *_highlight_anim(chart2, idx=0),
-            run_time=0.40,
-        )
-
-        # Step 2: ghost labels fly to header positions while charts slide back
-        ghost1 = MathTex(r"Z_{38}",   color=WHITE_TEXT).scale(LABEL_SCALE * 0.62)
-        ghost1.move_to(chart1[0][0].get_center())
-        ghost2 = MathTex(r"Z_{6051}", color=WHITE_TEXT).scale(LABEL_SCALE * 0.62)
-        ghost2.move_to(chart2[0][0].get_center())
-        self.add(ghost1, ghost2)
-        self.play(
-            Transform(ghost1, hdr1_n),
-            Transform(ghost2, hdr2_n),
-            chart1.animate.shift(LEFT * CHART_SHIFT),
-            chart2.animate.shift(LEFT * CHART_SHIFT),
-            lbl1.animate.shift(LEFT * CHART_SHIFT),
-            lbl2.animate.shift(LEFT * CHART_SHIFT),
-            run_time=0.55,
-        )
-        self.remove(ghost1, ghost2)
-        self.add(hdr1_n, hdr2_n)
-
-        # Step 3: descriptions + images slide in for both
-        self.play(
-            FadeIn(hdr1_d),
-            FadeIn(hdr2_d),
-            LaggedStart(*[FadeIn(im, shift=LEFT * 0.20) for im in imgs1], lag_ratio=0.03),
-            LaggedStart(*[FadeIn(im, shift=LEFT * 0.20) for im in imgs2], lag_ratio=0.03),
-            run_time=0.75,
-        )
-        self.play(Write(badge1), Write(badge2), run_time=0.40)
-        self.wait(0.4)
-        self.next_slide()
-
-        # ── Clear chart/images, keep title → show Figure 5 ────────────────
-        stuff_to_clear = Group(
-            lbl1, chart1, hdr1_n, hdr1_d, imgs1, badge1,
-            lbl2, chart2, hdr2_n, hdr2_d, imgs2, badge2,
-        )
-        self.play(FadeOut(stuff_to_clear), run_time=0.6)
+        # ── Assumption part (bar charts + top-activating images) commented out ──
+        # # ── Layout constants ──────────────────────────────────────────────────
+        # CHART_X     = -4.0
+        # IMG_X       =  1.4
+        # CHART_SHIFT =  0.35
+        # Y1, Y2      =  1.3, -2.2
+        #
+        # # ── Show both effect titles first ─────────────────────────────────────
+        # lbl1 = Text(
+        #     "Effect 1: wearing hat", color=WHITE_TEXT,
+        #     t2s={"wearing hat": ITALIC},
+        # ).scale(BODY_SCALE)
+        # lbl1.move_to([CHART_X, Y1 + 1.3, 0], aligned_edge=LEFT)
+        #
+        # lbl2 = Text(
+        #     "Effect 2: wearing sunglasses", color=WHITE_TEXT,
+        #     t2s={"wearing sunglasses": ITALIC},
+        # ).scale(BODY_SCALE)
+        # lbl2.move_to([CHART_X, Y2 + 1.3, 0], aligned_edge=LEFT)
+        #
+        # self.play(
+        #     FadeIn(lbl1, shift=RIGHT * 0.1),
+        #     FadeIn(lbl2, shift=RIGHT * 0.1),
+        #     run_time=0.7,
+        # )
+        # self.wait(0.3)
+        # self.next_slide()
+        #
+        # # ── Effects 1 & 2: bar charts (parallel) ──────────────────────────────
+        # chart1 = _bar_chart(HAT_DATA)
+        # chart1.move_to([CHART_X, Y1, 0])
+        # chart2 = _bar_chart(GLASSES_DATA)
+        # chart2.move_to([CHART_X, Y2, 0])
+        #
+        # lbl1.generate_target()
+        # lbl1.target.next_to(chart1, UP, buff=0.20, aligned_edge=LEFT)
+        # lbl2.generate_target()
+        # lbl2.target.next_to(chart2, UP, buff=0.20, aligned_edge=LEFT)
+        #
+        # self.play(
+        #     MoveToTarget(lbl1),
+        #     MoveToTarget(lbl2),
+        #     LaggedStart(*[FadeIn(r, shift=RIGHT * 0.06) for r in chart1], lag_ratio=0.04),
+        #     LaggedStart(*[FadeIn(r, shift=RIGHT * 0.06) for r in chart2], lag_ratio=0.04),
+        #     run_time=1.0,
+        # )
+        # self.wait(0.3)
+        # self.next_slide()
+        #
+        # # ── Effects 1 & 2: highlight → fly → images (parallel) ────────────────
+        # hdr1_n, hdr1_d, imgs1, badge1 = _build_panel("N_38",   r"Z_{38}",   Y1, IMG_X)
+        # hdr2_n, hdr2_d, imgs2, badge2 = _build_panel("N_6051", r"Z_{6051}", Y2, IMG_X)
+        #
+        # # Step 1: highlight top bar of both charts
+        # self.play(
+        #     *_highlight_anim(chart1, idx=0),
+        #     *_highlight_anim(chart2, idx=0),
+        #     run_time=0.40,
+        # )
+        #
+        # # Step 2: ghost labels fly to header positions while charts slide back
+        # ghost1 = MathTex(r"Z_{38}",   color=WHITE_TEXT).scale(LABEL_SCALE * 0.62)
+        # ghost1.move_to(chart1[0][0].get_center())
+        # ghost2 = MathTex(r"Z_{6051}", color=WHITE_TEXT).scale(LABEL_SCALE * 0.62)
+        # ghost2.move_to(chart2[0][0].get_center())
+        # self.add(ghost1, ghost2)
+        # self.play(
+        #     Transform(ghost1, hdr1_n),
+        #     Transform(ghost2, hdr2_n),
+        #     chart1.animate.shift(LEFT * CHART_SHIFT),
+        #     chart2.animate.shift(LEFT * CHART_SHIFT),
+        #     lbl1.animate.shift(LEFT * CHART_SHIFT),
+        #     lbl2.animate.shift(LEFT * CHART_SHIFT),
+        #     run_time=0.55,
+        # )
+        # self.remove(ghost1, ghost2)
+        # self.add(hdr1_n, hdr2_n)
+        #
+        # # Step 3: descriptions + images slide in for both
+        # self.play(
+        #     FadeIn(hdr1_d),
+        #     FadeIn(hdr2_d),
+        #     LaggedStart(*[FadeIn(im, shift=LEFT * 0.20) for im in imgs1], lag_ratio=0.03),
+        #     LaggedStart(*[FadeIn(im, shift=LEFT * 0.20) for im in imgs2], lag_ratio=0.03),
+        #     run_time=0.75,
+        # )
+        # self.play(Write(badge1), Write(badge2), run_time=0.40)
+        # self.wait(0.4)
+        # self.next_slide()
+        #
+        # # ── Clear chart/images, keep title → show Figure 5 ────────────────
+        # stuff_to_clear = Group(
+        #     lbl1, chart1, hdr1_n, hdr1_d, imgs1, badge1,
+        #     lbl2, chart2, hdr2_n, hdr2_d, imgs2, badge2,
+        # )
+        # self.play(FadeOut(stuff_to_clear), run_time=0.6)
 
         FRAMES_DIR = os.path.join(EXPERIMENT_DIR, "frames")
-        FIG_H = 5.2
+        FIG_H = 5.7
 
         # ── Phase 1: bars grow gradually (frame sequence) ────────────────
         N_FRAMES = 15
@@ -262,24 +264,44 @@ class S09Experiments(Slide):
         self.remove(fig_current)
         fig_current = fig_trend
 
-        self.wait(0.4)
-        self.next_slide()
+        # ── Phase 2b: ECI paradox label (line 1 only) ────────────────────
+        PAR_SCALE = BODY_SCALE
 
-        # ── Phase 2b: ECI paradox label ──────────────────────────────────
-        paradox_text = Text(
-            "Exploratory Causal Inference Paradox",
-            color=RED_LIGHT,
-            t2s={"Exploratory Causal Inference Paradox": ITALIC},
-        ).scale(BODY_SCALE * 1.1)
-        paradox_text.next_to(fig_current, DOWN, buff=0.25)
+        lbl1  = Text("Multiple Testing:", color=WHITE_TEXT).scale(PAR_SCALE)
+        lbl2  = Text("NES (ours):",       color=WHITE_TEXT).scale(PAR_SCALE)
+        tail1 = Text(
+            "precision collapse",
+            color=WHITE_TEXT,
+            t2s={"precision collapse": ITALIC},
+        ).scale(PAR_SCALE)
+        tail2 = Text(
+            "precision collapse",
+            color=WHITE_TEXT,
+            t2s={"precision collapse": ITALIC},
+        ).scale(PAR_SCALE)
 
-        self.play(Write(paradox_text), run_time=0.7)
+        # Stack labels right-aligned so colons line up; tails share a left edge.
+        lbl2.next_to(lbl1, DOWN, buff=0.15, aligned_edge=RIGHT)
+        tail1.next_to(lbl1, RIGHT, buff=0.22)
+        tail2.next_to(lbl2, RIGHT, buff=0.22)
+        tail2.align_to(tail1, LEFT)
+
+        strike = Line(
+            tail2.get_left()  + LEFT  * 0.05,
+            tail2.get_right() + RIGHT * 0.05,
+            color=WHITE_TEXT, stroke_width=2.5,
+        )
+
+        line1_group = VGroup(lbl1, tail1)
+        line2_group = VGroup(lbl2, tail2, strike)
+        paradox_block = VGroup(line1_group, line2_group)
+        paradox_block.next_to(fig_current, DOWN, buff=0.22)
+
+        self.play(Write(line1_group), run_time=0.8)
         self.wait(0.3)
         self.next_slide()
 
-        # ── Phase 3: NES grows in (frame sequence) ───────────────────────
-        self.play(FadeOut(paradox_text), run_time=0.3)
-
+        # ── Phase 3: NES grows in (frame sequence), then line 2 writes in ──
         nes_frames = []
         for i in range(N_FRAMES):
             img = ImageMobject(os.path.join(FRAMES_DIR, f"add_nes_{i:02d}.png"))
@@ -292,6 +314,8 @@ class S09Experiments(Slide):
             self.remove(nes_frames[i - 1])
             self.add(nes_frames[i])
             self.wait(1/15)
+
+        self.play(Write(line2_group), run_time=0.9)
 
         self.wait(0.4)
         self.next_slide()
