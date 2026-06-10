@@ -35,7 +35,7 @@ class S02Agenda(Slide):
 
         # ── Item 2 ──────────────────────────────────────────────────────────
         item2_num  = Text("2.", color=WHITE_TEXT).scale(0.58)
-        item2_main = Text("Heterogeneous Treatment Effect Modifiers Exploration",
+        item2_main = Text("Heterogeneous Treatment Effect Exploration",
                           color=WHITE_TEXT).scale(0.58)
         item2_head = VGroup(item2_num, item2_main).arrange(RIGHT, buff=0.28)
         item2_sub = MarkupText(
