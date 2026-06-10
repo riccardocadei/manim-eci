@@ -10,11 +10,11 @@ class S19RealWorld(Slide):
         self.camera.background_color = BG
 
         title = Text(
-            "Results: Humanitarian Program (LEAP1000)",
+            "Results: Two anti-poverty programs",
             color=WHITE_TEXT,
-            t2s={"Humanitarian Program (LEAP1000)": ITALIC},
+            t2s={"Two anti-poverty programs": ITALIC},
         ).scale(TITLE_SCALE).to_edge(UP, buff=0.4)
-        placeholder = Text("work in progress", color=GRAY_TEXT, slant=ITALIC).scale(BODY_SCALE)
+        placeholder = Text("See: https://www.riccardocadei.com/NEXIS/", color=GRAY_TEXT, slant=ITALIC).scale(BODY_SCALE)
 
         self.play(Write(title), run_time=0.8)
         self.play(FadeIn(placeholder), run_time=0.5)

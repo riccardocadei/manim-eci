@@ -1,5 +1,5 @@
 """
-Render s18 Figure frame sequences (2x3 subplots) for multi-phase animated
+Render s18 Figure frame sequences (2x2 subplots) for multi-phase animated
 reveal in Manim. Mirrors the s09 pattern in assets/data/experiment/render_figure5.py.
 
 Phases:
@@ -55,7 +55,6 @@ NEMS_KEYS     = {NEMS_METHOD[0]}
 METRICS = [
     ("precision", "Precision"),
     ("recall",    "Recall"),
-    ("iou",       "IoU"),
 ]
 
 # Data filters (per user request)
@@ -163,7 +162,7 @@ def plot_bars_on_ax(ax, df, x_axis_col, x_values, metric_key,
 def render_frame(df_e, df_n, out_path,
                  height_scale=None, dim_keys=None, hide_keys=None,
                  legend_methods=None, draw_trend=False):
-    fig, axes = plt.subplots(2, 3, figsize=(18, 10), sharex=False, sharey=False)
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10), sharex=False, sharey=False)
     fig.patch.set_facecolor(BG)
 
     # Row 1: varying sample size n (fixed η=5)

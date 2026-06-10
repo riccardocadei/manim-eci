@@ -6,7 +6,7 @@ from config import *
 
 
 FRAMES_DIR = os.path.join(os.path.dirname(__file__), "..",
-                          "assets", "data", "nems", "frames")
+                          "assets", "data", "nexis", "frames")
 
 
 class S18Experiments(Slide):
@@ -65,7 +65,7 @@ class S18Experiments(Slide):
         PAR_SCALE = BODY_SCALE
 
         lbl1  = Text("Multiple Testing:", color=WHITE_TEXT).scale(PAR_SCALE)
-        lbl2  = Text("NEMS (ours):",      color=WHITE_TEXT).scale(PAR_SCALE)
+        lbl2  = Text("NEXIS (ours):",      color=WHITE_TEXT).scale(PAR_SCALE)
         tail1 = Text(
             "precision collapse",
             color=WHITE_TEXT,
@@ -98,15 +98,15 @@ class S18Experiments(Slide):
         self.wait(0.3)
         self.next_slide()
 
-        # ── Phase 3: NEMS grows in (frame sequence), then line 2 writes in ─
-        nems_frames = [
-            ImageMobject(os.path.join(FRAMES_DIR, f"add_nems_{i:02d}.png"))
+        # ── Phase 3: NEXIS grows in (frame sequence), then line 2 writes in ─
+        nexis_frames = [
+            ImageMobject(os.path.join(FRAMES_DIR, f"add_nexis_{i:02d}.png"))
                 .set_height(FIG_H).move_to(fig_current.get_center())
             for i in range(N_FRAMES)
         ]
         self.remove(fig_current)
-        self.add(nems_frames[0])
-        self.play(_sweep(nems_frames))
+        self.add(nexis_frames[0])
+        self.play(_sweep(nexis_frames))
 
         self.play(Write(line2_group), run_time=0.9)
         self.wait(0.4)
