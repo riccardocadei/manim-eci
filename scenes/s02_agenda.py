@@ -12,7 +12,7 @@ class S02Agenda(Slide):
         title = Text("Agenda", color=WHITE_TEXT).scale(TITLE_SCALE).to_edge(UP, buff=0.4)
 
         subtitle = Text(
-            "How to move from 'Rationalist' to 'Empiricist' in Causal Inference?",
+            "How to move from 'Rationalist' to 'Empiricist' in Causal Inference? (what)",
             color=GRAY_TEXT, slant=ITALIC,
         ).scale(BODY_SCALE)
         if subtitle.width > config.frame_width - 0.8:
@@ -34,7 +34,7 @@ class S02Agenda(Slide):
 
         # ── Item 2 ──────────────────────────────────────────────────────────
         item2_num  = Text("2.", color=WHITE_TEXT).scale(0.58)
-        item2_main = Text("Heterogeneous Treatment Effect Exploration",
+        item2_main = Text("Heterogeneous Treatment Effect Exploration (how)",
                           color=WHITE_TEXT).scale(0.58)
         item2_head = VGroup(item2_num, item2_main).arrange(RIGHT, buff=0.28)
         item2_sub = MarkupText(
@@ -62,7 +62,7 @@ class S02Agenda(Slide):
 
         # ── Emphasize item 1 (bold + larger) ────────────────────────────────
         item1_main_target = Text(
-            "Treatment Effect Exploration",
+            "Treatment Effect Exploration (what)",
             color=WHITE_TEXT, weight=BOLD,
         ).scale(0.58 * 1.18)
         item1_main_target.align_to(item1_main, LEFT).align_to(item1_main, DOWN)
