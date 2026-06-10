@@ -14,6 +14,7 @@ GREEN_LIGHT  = "#6FD18A"   # true effects / NES
 RED_LIGHT    = "#F47C7C"   # paradox / wrong / baselines
 YELLOW_LIGHT = "#F5C842"   # emphasis / paradox label
 PURPLE_LIGHT = "#C39BD3"   # SAE / latent space
+TEAL_LIGHT   = "#4FD6C0"   # second dataset / interpretation
 
 # ── Typography ───────────────────────────────────────────────────────────────
 TITLE_SCALE  = 0.72
