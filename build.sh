@@ -28,7 +28,7 @@ SCENES=(
   "scenes/s14_objective.py        S14Objective       s14"
   "scenes/s15_dictionary.py       S15Dictionary      s15"
   "scenes/s16_paradox.py          S16Paradox         s16"
-  "scenes/s17_nems.py             S17NEMS            s17"
+  "scenes/s17_nexis.py            S17NEXIS           s17"
   "scenes/s18_experiments.py      S18Experiments     s18"
   "scenes/s19_real_world.py       S19RealWorld       s19"
   "scenes/s20_conclusion.py       S20Conclusion      s20"
