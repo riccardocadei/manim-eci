@@ -12,8 +12,7 @@ class S02Agenda(Slide):
         title = Text("Agenda", color=WHITE_TEXT).scale(TITLE_SCALE).to_edge(UP, buff=0.4)
 
         subtitle = Text(
-            "Is modern representation learning a valid measurement tool "
-            "for complex scientific experiments?",
+            "How to move from 'Rationalist' to 'Empiricist' in Causal Inference?",
             color=GRAY_TEXT, slant=ITALIC,
         ).scale(BODY_SCALE)
         if subtitle.width > config.frame_width - 0.8:
