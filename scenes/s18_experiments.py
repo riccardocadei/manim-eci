@@ -61,21 +61,44 @@ class S18Experiments(Slide):
         self.wait(0.4)
         self.next_slide()
 
-        # ── Phase 2b: ECI paradox label ───────────────────────────────────
-        paradox_text = Text(
-            "Exploratory Causal Inference Paradox",
-            color=RED_LIGHT,
-            t2s={"Exploratory Causal Inference Paradox": ITALIC},
-        ).scale(BODY_SCALE * 1.1)
-        paradox_text.next_to(fig_current, DOWN, buff=0.25)
+        # ── Phase 2b: ECI paradox label (line 1 only) ─────────────────────
+        PAR_SCALE = BODY_SCALE
 
-        self.play(Write(paradox_text), run_time=0.7)
+        lbl1  = Text("Multiple Testing:", color=WHITE_TEXT).scale(PAR_SCALE)
+        lbl2  = Text("NEMS (ours):",      color=WHITE_TEXT).scale(PAR_SCALE)
+        tail1 = Text(
+            "precision collapse",
+            color=WHITE_TEXT,
+            t2s={"precision collapse": ITALIC},
+        ).scale(PAR_SCALE)
+        tail2 = Text(
+            "precision collapse",
+            color=WHITE_TEXT,
+            t2s={"precision collapse": ITALIC},
+        ).scale(PAR_SCALE)
+
+        # Stack labels right-aligned so colons line up; tails share a left edge.
+        lbl2.next_to(lbl1, DOWN, buff=0.15, aligned_edge=RIGHT)
+        tail1.next_to(lbl1, RIGHT, buff=0.22)
+        tail2.next_to(lbl2, RIGHT, buff=0.22)
+        tail2.align_to(tail1, LEFT)
+
+        strike = Line(
+            tail2.get_left()  + LEFT  * 0.05,
+            tail2.get_right() + RIGHT * 0.05,
+            color=WHITE_TEXT, stroke_width=2.5,
+        )
+
+        line1_group = VGroup(lbl1, tail1)
+        line2_group = VGroup(lbl2, tail2, strike)
+        paradox_block = VGroup(line1_group, line2_group)
+        paradox_block.next_to(fig_current, DOWN, buff=0.22)
+
+        self.play(Write(line1_group), run_time=0.8)
         self.wait(0.3)
         self.next_slide()
 
-        # ── Phase 3: baselines dim, NEMS (ours) grows in ──────────────────
-        self.play(FadeOut(paradox_text), run_time=0.3)
-
+        # ── Phase 3: NEMS grows in (frame sequence), then line 2 writes in ─
         nems_frames = [
             ImageMobject(os.path.join(FRAMES_DIR, f"add_nems_{i:02d}.png"))
                 .set_height(FIG_H).move_to(fig_current.get_center())
@@ -84,5 +107,7 @@ class S18Experiments(Slide):
         self.remove(fig_current)
         self.add(nems_frames[0])
         self.play(_sweep(nems_frames))
-        self.wait(0.6)
+
+        self.play(Write(line2_group), run_time=0.9)
+        self.wait(0.4)
         self.next_slide()
