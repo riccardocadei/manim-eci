@@ -37,7 +37,7 @@ class S11Agenda(Slide):
         item2_main = MarkupText("Heterogeneous Treatment Effect Exploration <i>(how)</i>",
                                 color=WHITE_TEXT).scale(0.58)
         item2_head = VGroup(item2_num, item2_main).arrange(RIGHT, buff=0.28)
-        item2_sub = MarkupText(
+        item2_sub = Text(
             'From tokens to policy: Causal and Interpretable Heterogeneous Treatment Effect Identification'
             '\nCadei, Otchere, Tirivayi, Tagliaferro, Bargagli-Stoffi, Locatello'
             '\npreprint (short version at workshop AISTATS’26)',

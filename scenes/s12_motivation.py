@@ -28,8 +28,8 @@ class S12Motivation(Slide):
 
         # ── Slide: title + ChatGPT prompt + images ────────────────────────────
 
-        motiv_title = Text("Motivation: Humanitarian Program",
-                           t2s={"Humanitarian Program": ITALIC},
+        motiv_title = Text("Motivation: Anti-Poverty Program",
+                           t2s={"Anti-Poverty Program": ITALIC},
                            color=WHITE_TEXT).scale(TITLE_SCALE).to_edge(UP, buff=0.4)
         self.play(Write(motiv_title), run_time=0.8)
         self.wait(0.3)
